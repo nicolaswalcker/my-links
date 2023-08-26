@@ -5,10 +5,14 @@ export default defineNuxtConfig({
     '@nuxtjs/eslint-module',
     '@vueuse/nuxt'
   ],
+  tailwindcss: {
+    cssPath: '~/assets/css/global.css',
+    configPath: 'tailwind.config'
+  },
   app: {
     head: {
       htmlAttrs: {
-        'data-theme': 'dark'
+        'data-theme': 'cupcake'
       }
     }
   },
