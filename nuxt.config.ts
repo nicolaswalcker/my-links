@@ -4,7 +4,13 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/eslint-module',
     '@vueuse/nuxt'
-
   ],
+  app: {
+    head: {
+      htmlAttrs: {
+        'data-theme': 'dark'
+      }
+    }
+  },
   devtools: { enabled: true }
 })
