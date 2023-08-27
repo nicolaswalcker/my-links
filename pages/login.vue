@@ -12,11 +12,11 @@
       <form class="flex flex-col items-start justify-center gap-4 w-full">
         <div class="form-control w-full">
           <label class="label" for="email">Email</label>
-          <input id="email" required type="email" class="input input-ghost input-bordered ">
+          <input id="email" placeholder="johndoe@emil.com" required type="email" class="input input-ghost input-bordered ">
         </div>
         <div class="form-control w-full">
           <label class="label" for="password">Senha</label>
-          <input id="password" required type="password" class="input input-ghost input-bordered ">
+          <input id="password" placeholder="Digite sua senha" required type="password" class="input input-ghost input-bordered ">
         </div>
         <div class="w-full flex items-center justify-between flex-wrap gap-3">
           <div class="flex gap-2">
