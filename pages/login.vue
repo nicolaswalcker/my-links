@@ -1,11 +1,11 @@
 <template>
-  <section class="h-screen w-full flex items-center justify-center bg-slate-100">
-    <article class="bg-white p-5 rounded-md flex flex-col items-start justify-center gap-4 w-full h-full sm:max-h-[500px] sm:max-w-[450px]">
+  <section class="h-screen w-full flex items-center justify-center bg-base-200">
+    <article class="bg-base-100 prose p-5 rounded-md flex flex-col items-start justify-center gap-4 w-full h-full sm:max-h-[500px] sm:max-w-[450px]">
       <div class="flex flex-col items-start justify-start gap-3">
-        <h1 class="font-bold text-4xl text-slate-700">
+        <h1 class="font-bold text-4xl">
           Entrar
         </h1>
-        <p class="text-slate-500">
+        <p class="opacity-75">
           Que legal te ver novamente!
         </p>
       </div>
@@ -23,7 +23,7 @@
             <input id="remember" name="remember" type="checkbox" class="checkbox">
             <label for="remember">Lembrar de mim</label>
           </div>
-          <a href="#" class="text-slate-500 hover:underline">Esqueci minha senha</a>
+          <a href="#" class="link">Esqueci minha senha</a>
         </div>
         <button class="btn w-full">
           Entrar
