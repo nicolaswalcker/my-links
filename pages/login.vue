@@ -6,7 +6,7 @@
           Entrar
         </h1>
         <p class="text-slate-500">
-          Vamos começar a mostrar seus links para o mundo?
+          Que legal te ver novamente!
         </p>
       </div>
       <form class="flex flex-col items-start justify-center gap-4 w-full">
