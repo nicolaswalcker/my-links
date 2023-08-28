@@ -42,7 +42,8 @@
       </p>
     </button>
   </header>
-  <main class="h-screen w-full">
+
+  <main class="h-auto min-h-[calc(100vh-88px)] w-full">
     <slot />
   </main>
 </template>
