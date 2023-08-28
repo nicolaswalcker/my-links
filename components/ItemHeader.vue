@@ -1,0 +1,22 @@
+<template>
+  <header class="w-full flex justify-between items-center">
+    <div class="flex items-center gap-2">
+      <Icon name="ri:link-m" />
+      <strong>Link #{{ number }}</strong>
+    </div>
+    <button class="btn btn-ghost btn-sm" @click="$emit('delete:item')">
+      Remove
+    </button>
+  </header>
+</template>
+
+<script lang="ts" setup>
+defineEmits(['delete:item'])
+defineProps<{
+  number: number
+}>()
+</script>
+
+<style>
+
+</style>
