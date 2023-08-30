@@ -1,5 +1,5 @@
 <template>
-  <header class="w-full flex justify-between items-center">
+  <header class="flex w-full items-center justify-between">
     <div class="flex items-center gap-2">
       <Icon name="ri:link-m" />
       <strong>Link #{{ number }}</strong>

@@ -1,18 +1,18 @@
 <template>
-  <section class="h-screen w-full flex items-center justify-center bg-base-200">
-    <article class="bg-base-100 p-5 rounded-md flex flex-col items-start justify-center gap-4 w-full h-full sm:max-h-[600px] sm:max-w-[450px]">
+  <section class="flex h-screen w-full items-center justify-center bg-base-200">
+    <article class="flex h-full w-full flex-col items-start justify-center gap-4 rounded-md bg-base-100 p-5 sm:max-h-[600px] sm:max-w-[450px]">
       <div class="flex flex-col items-start justify-start gap-3">
-        <h1 class="font-bold text-4xl">
+        <h1 class="text-4xl font-bold">
           Criar nova conta
         </h1>
         <p class="opacity-75">
           Vamos começar a mostrar seus links para o mundo?
         </p>
       </div>
-      <form class="flex flex-col items-start justify-center gap-4 w-full">
+      <form class="flex w-full flex-col items-start justify-center gap-4">
         <div class="form-control w-full">
           <label class="label" for="email">Email</label>
-          <input id="email" placeholder="johndoe@emil.com" required type="email" class="input input-ghost input-bordered ">
+          <input id="email" placeholder="johndoe@emil.com" required type="email" class="input input-bordered input-ghost ">
         </div>
         <div class="form-control w-full">
           <label class="label" for="password">Senha</label>
@@ -23,7 +23,7 @@
             placeholder="Digite sua senha"
             required
             type="password"
-            class="input input-ghost input-bordered"
+            class="input input-bordered input-ghost"
           >
           <small class="pt-1">A senha deve conter no mínimo 8 caracteres</small>
         </div>
@@ -35,7 +35,7 @@
             placeholder="Digite sua senha novamente"
             required
             type="password"
-            class="input input-ghost input-bordered"
+            class="input input-bordered input-ghost"
           >
           <small v-if="password && !passwordMatch && confirm.length" class="pt-1">As senhas não coincidem</small>
         </div>
