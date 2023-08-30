@@ -10,6 +10,9 @@ export default defineNuxtConfig({
     cssPath: '~/assets/css/global.css',
     configPath: 'tailwind.config'
   },
+  eslint: {
+    lintOnStart: false
+  },
   app: {
     head: {
       htmlAttrs: {
