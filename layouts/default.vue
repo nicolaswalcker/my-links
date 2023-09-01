@@ -1,5 +1,5 @@
 <template>
-  <header class="h-auto bg-base-100 flex justify-around items-center p-5 flex-wrap gap-2">
+  <header class="flex h-auto flex-wrap items-center justify-around gap-2 bg-base-100 p-5">
     <div class="btn btn-outline" :class="smallerThanSm ? 'btn-square' : ''">
       <Icon name="simple-icons:hyperledger" size="24" />
       <p class="hidden sm:block">
