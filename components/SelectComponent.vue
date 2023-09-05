@@ -143,5 +143,3 @@ const onSelect = (value: Social) => {
   toggleMenu()
 }
 </script>
-
-<style></style>

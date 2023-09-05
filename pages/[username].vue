@@ -1,9 +1,9 @@
 <template>
   <section
-    class="flex h-[calc(100vh-88px)] w-full items-center justify-center bg-base-200 md:py-10"
+    class="flex h-screen w-full items-center justify-center bg-base-200 md:py-10"
   >
     <article
-      class="flex h-full w-full flex-col items-center justify-between gap-3 rounded-md bg-base-100 p-6 md:max-h-[80%] md:max-w-[350px] md:justify-center"
+      class="flex h-full w-full flex-col items-center justify-center gap-5 rounded-md bg-base-100 p-6 md:max-h-[70%] md:max-w-[350px]"
     >
       <div class="flex w-full flex-col items-center justify-center gap-1">
         <img
@@ -36,4 +36,15 @@
   </section>
 </template>
 
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+definePageMeta({
+  layout: false
+})
+
+const route = useRoute()
+const username = route.params.username
+
+useSeoMeta({
+  title: 'MyLinks - @' + username
+})
+</script>
