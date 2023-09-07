@@ -1,6 +1,8 @@
 <template>
   <section class="flex h-screen w-full items-center justify-center bg-base-200">
-    <article class="flex h-full w-full flex-col items-start justify-center gap-4 rounded-md bg-base-100 p-5 sm:max-h-[600px] sm:max-w-[450px]">
+    <article
+      class="flex h-full w-full flex-col items-start justify-center gap-4 rounded-md bg-base-100 p-5 sm:h-auto sm:max-w-[450px]"
+    >
       <div class="flex flex-col items-start justify-start gap-3">
         <h1 class="text-4xl font-bold">
           Criar nova conta
@@ -9,42 +11,49 @@
           Vamos começar a mostrar seus links para o mundo?
         </p>
       </div>
-      <form class="flex w-full flex-col items-start justify-center gap-4">
-        <div class="form-control w-full">
-          <label class="label" for="email">Email</label>
-          <input id="email" placeholder="johndoe@emil.com" required type="email" class="input input-bordered input-ghost ">
-        </div>
-        <div class="form-control w-full">
-          <label class="label" for="password">Senha</label>
-          <input
-            id="password"
-            v-model="password"
-            minlength="8"
-            placeholder="Digite sua senha"
-            required
-            type="password"
-            class="input input-bordered input-ghost"
-          >
-          <small class="pt-1">A senha deve conter no mínimo 8 caracteres</small>
-        </div>
-        <div class="form-control w-full">
-          <label class="label" for="confirm">Confirmar senha</label>
-          <input
-            id="confirm"
-            v-model="confirm"
-            placeholder="Digite sua senha novamente"
-            required
-            type="password"
-            class="input input-bordered input-ghost"
-          >
-          <small v-if="password && !passwordMatch && confirm.length" class="pt-1">As senhas não coincidem</small>
-        </div>
-        <button :disabled="!passwordMatch" class="btn w-full">
-          Criar conta
+      <form
+        class="flex w-full flex-col items-start justify-center gap-4"
+        @submit.prevent="onSubmit"
+      >
+        <InputItem
+          v-model="email"
+          :error="errors.email"
+          name="email"
+          label="Email"
+          placeholder="johndoe@email.com"
+          type="email"
+        >
+          <ErrorItem :error="errors.email" />
+        </InputItem>
+        <InputItem
+          v-model="password"
+          :error="errors.password"
+          name="password"
+          label="Senha"
+          placeholder="Digite sua senha"
+          type="password"
+        >
+          <ErrorItem :error="errors.password" />
+        </InputItem>
+        <InputItem
+          v-model="confirm"
+          :error="errors.confirm"
+          name="confirm"
+          label="Confirmar senha"
+          placeholder="Digite sua senha novamente"
+          type="password"
+        >
+          <ErrorItem :error="errors.confirm" />
+        </InputItem>
+        <ErrorItem :error="errorMsg" />
+        <button class="btn w-full">
+          <icon v-if="loading" name="svg-spinners:8-dots-rotate" />
+          <span v-else>Criar conta</span>
         </button>
       </form>
       <p class="self-center">
-        Já uma conta? <NuxtLink class="link" to="/login">
+        Já uma conta?
+        <NuxtLink class="link" to="/login">
           Entre aqui!
         </NuxtLink>
       </p>
@@ -53,18 +62,75 @@
 </template>
 
 <script lang="ts" setup>
+import { useForm, useField } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
+import * as zod from 'zod'
 useHead({
   title: 'Criar conta'
 })
 definePageMeta({
   layout: false
 })
+const route = useRouter()
+const validationSchema = toTypedSchema(
+  zod
+    .object({
+      email: zod
+        .string({
+          required_error: 'O email é obrigatório'
+        })
+        .nonempty({ message: 'O email é obrigatório' })
+        .email({ message: 'O email deve ser válido' }),
+      password: zod
+        .string({
+          required_error: 'A senha é obrigatória'
+        })
+        .nonempty({ message: 'A senha é obrigatória' })
+        .min(8, 'A senha deve conter no mínimo 8 caracteres'),
+      confirm: zod
+        .string({
+          required_error: 'A confirmação de senha é obrigatória'
+        })
+        .nonempty({ message: 'A confirmação de senha é obrigatória' })
+    })
+    .refine(data => data.password === data.confirm, {
+      message: 'As senhas não coincidem',
+      path: ['confirm']
+    })
+)
 
-const password = ref('')
-const confirm = ref('')
-const passwordMatch = computed(() => password.value === confirm.value)
+const { handleSubmit, errors } = useForm({
+  validationSchema
+})
+
+const supabase = useSupabaseClient()
+
+const signUp = async (email: string, password: string) => {
+  loading.value = true
+  try {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password
+    })
+    if (error) { throw error }
+  } catch (error: any) {
+    errorMsg.value = error.message
+    setTimeout(() => {
+      errorMsg.value = ''
+    }, 5000)
+  } finally {
+    loading.value = false
+    route.push('/')
+  }
+}
+const errorMsg = ref('')
+const loading = ref(false)
+
+const onSubmit = handleSubmit((values) => {
+  signUp(values.email, values.password)
+})
+
+const { value: email } = useField<string>('email')
+const { value: password } = useField<string>('password')
+const { value: confirm } = useField<string>('confirm')
 </script>
-
-<style>
-
-</style>
