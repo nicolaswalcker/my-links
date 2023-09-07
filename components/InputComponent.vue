@@ -11,7 +11,3 @@ defineProps<{
   modelValue: string
 }>()
 </script>
-
-<style>
-
-</style>
