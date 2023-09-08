@@ -4,7 +4,7 @@
   >
     <div class="relative hidden h-[700px] w-[40%] md:block">
       <div
-        class="flex h-[700px] w-[calc(40%-16px)] items-center justify-center rounded-lg bg-base-100 p-6 md:fixed"
+        class="top-[calc(16px+88px)] flex h-[700px] w-[calc(40%-16px)] items-center justify-center rounded-lg bg-base-100 p-6 md:fixed"
       >
         <img
           class="absolute left-1/2 -translate-x-1/2"
@@ -92,20 +92,38 @@
         </div>
       </div>
 
-      <button v-if="inputs.length" class="btn btn-primary self-end">
-        Salvar
+      <button v-if="inputs.length" class="btn btn-primary self-end" @click="savePlatforms">
+        <Icon v-if="saving" name="svg-spinners:8-dots-rotate" size="24" />
+        <span v-else>Salvar</span>
       </button>
     </div>
   </section>
 </template>
 
 <script lang="ts" setup>
+useHead({
+  title: 'Links',
+  meta: [
+    {
+      name: 'description',
+      content: 'Customize seus links'
+    }
+  ]
+})
+definePageMeta({
+  middleware: 'auth'
+})
+
 interface Input {
   id: number;
   platform: { name: string; icon: string };
   link: string;
 }
 const inputs = ref<Array<Input>>([])
+const supabase = useSupabaseClient()
+const user = useSupabaseUser()
+
+const saving = ref(false)
 
 const addInput = () => {
   inputs.value.push({
@@ -133,7 +151,49 @@ const changePlatform = (
   })
 }
 
+onMounted(() => {
+  getPlatforms()
+})
+
 const removeInput = (id: number) => {
   inputs.value = inputs.value.filter(item => item.id !== id)
+}
+
+const savePlatforms = async () => {
+  try {
+    saving.value = true
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({
+        social_links: inputs.value
+      } as never)
+      .eq('id', user.value?.id as string).select('social_links')
+
+    if (data) {
+      inputs.value = data[0].social_links
+    }
+
+    if (error) { throw error }
+  } catch (error: any) {
+    throw error.message
+  } finally {
+    saving.value = false
+  }
+}
+
+const getPlatforms = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('social_links')
+      .eq('id', user.value?.id as string)
+
+    if (error) { throw error }
+    if (data) {
+      inputs.value = data[0].social_links
+    }
+  } catch (error: any) {
+    console.log(error.message)
+  }
 }
 </script>
