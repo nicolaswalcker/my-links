@@ -112,6 +112,9 @@ const signUp = async (email: string, password: string) => {
       email,
       password
     })
+    if (data) {
+      await insertProfile(email, data.user?.id as string)
+    }
     if (error) { throw error }
   } catch (error: any) {
     errorMsg.value = error.message
@@ -123,6 +126,22 @@ const signUp = async (email: string, password: string) => {
     route.push('/')
   }
 }
+
+const insertProfile = async (email: string, id: string) => {
+  try {
+    const { error } = await supabase.from('profiles').insert({
+      email,
+      id
+    } as any).select('*') // TODO: type this any
+    if (error) { throw error }
+  } catch (error: any) {
+    errorMsg.value = error.message
+    setTimeout(() => {
+      errorMsg.value = ''
+    }, 5000)
+  }
+}
+
 const errorMsg = ref('')
 const loading = ref(false)
 
