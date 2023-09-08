@@ -106,8 +106,8 @@ const { handleSubmit, errors } = useForm({
 const supabase = useSupabaseClient()
 
 const signUp = async (email: string, password: string) => {
-  loading.value = true
   try {
+    loading.value = true
     const { data, error } = await supabase.auth.signUp({
       email,
       password
@@ -115,7 +115,10 @@ const signUp = async (email: string, password: string) => {
     if (data) {
       await insertProfile(email, data.user?.id as string)
     }
-    if (error) { throw error }
+    if (error) {
+      throw error
+    }
+    await route.push('/')
   } catch (error: any) {
     errorMsg.value = error.message
     setTimeout(() => {
@@ -123,7 +126,6 @@ const signUp = async (email: string, password: string) => {
     }, 5000)
   } finally {
     loading.value = false
-    route.push('/')
   }
 }
 
