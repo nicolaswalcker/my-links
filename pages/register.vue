@@ -17,7 +17,6 @@
       >
         <InputItem
           v-model="email"
-          :error="errors.email"
           name="email"
           label="Email"
           placeholder="johndoe@email.com"
@@ -27,7 +26,6 @@
         </InputItem>
         <InputItem
           v-model="password"
-          :error="errors.password"
           name="password"
           label="Senha"
           placeholder="Digite sua senha"
@@ -37,7 +35,6 @@
         </InputItem>
         <InputItem
           v-model="confirm"
-          :error="errors.confirm"
           name="confirm"
           label="Confirmar senha"
           placeholder="Digite sua senha novamente"
