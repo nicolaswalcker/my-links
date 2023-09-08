@@ -22,6 +22,10 @@ export default defineNuxtConfig({
       htmlAttrs: {
         'data-theme': 'light'
       }
+    },
+    pageTransition: {
+      name: 'page',
+      mode: 'out-in'
     }
   },
   devtools: { enabled: true }
