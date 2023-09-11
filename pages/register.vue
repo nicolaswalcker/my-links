@@ -62,6 +62,7 @@
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
+import { useProfile } from '~/stores/profile'
 useHead({
   title: 'Criar conta'
 })
@@ -96,6 +97,8 @@ const validationSchema = toTypedSchema(
     })
 )
 
+const profile = useProfile()
+
 const { handleSubmit, errors } = useForm({
   validationSchema
 })
@@ -111,6 +114,10 @@ const signUp = async (email: string, password: string) => {
     })
     if (data) {
       await insertProfile(email, data.user?.id as string)
+      profile.setProfile({
+        email,
+        id: data.user?.id as string
+      })
     }
     if (error) {
       throw error

@@ -1,5 +1,9 @@
-export interface Social {
+export type SocialPlatform = {
   name: string;
   icon: string;
-  url?: string;
+}
+export type Social = {
+  id: number,
+  link: string,
+  platform: SocialPlatform
 }

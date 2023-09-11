@@ -87,7 +87,7 @@
               :selected="item.platform"
               @update:selected="changePlatform(item.id, $event)"
             />
-            <input-component v-model="item.link" />
+            <InputItem v-model="item.link" label="Plataforma" placeholder="Insira a plataforma" :name="`input-${index}`" />
           </main>
         </div>
       </div>
@@ -101,6 +101,8 @@
 </template>
 
 <script lang="ts" setup>
+import { Database } from '~/utils/types/supabase'
+
 useHead({
   title: 'Links',
   meta: [
@@ -120,7 +122,7 @@ interface Input {
   link: string;
 }
 const inputs = ref<Array<Input>>([])
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
 
 const saving = ref(false)
@@ -166,11 +168,11 @@ const savePlatforms = async () => {
       .from('profiles')
       .update({
         social_links: inputs.value
-      } as never)
+      })
       .eq('id', user.value?.id as string).select('social_links')
 
     if (data) {
-      inputs.value = data[0].social_links
+      inputs.value = data[0].social_links as any
     }
 
     if (error) { throw error }
@@ -190,7 +192,7 @@ const getPlatforms = async () => {
 
     if (error) { throw error }
     if (data) {
-      inputs.value = data[0].social_links
+      inputs.value = data[0].social_links as any
     }
   } catch (error: any) {
     console.log(error.message)

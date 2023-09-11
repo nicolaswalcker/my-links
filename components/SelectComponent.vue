@@ -50,14 +50,14 @@
 </template>
 
 <script lang="ts" setup>
-import { Social } from '@/utils/types/social'
+import { type SocialPlatform } from '@/utils/types/social'
 const menu = ref(false)
 const toggleMenu = () => {
   menu.value = !menu.value
 }
 
 const prop = withDefaults(defineProps<{
-  selected: Social
+  selected: SocialPlatform
 }>(), {
   selected: () => ({
     name: 'facebook',
@@ -65,12 +65,10 @@ const prop = withDefaults(defineProps<{
   })
 })
 
-const selected = ref<Social>(prop.selected)
+const selected = ref<SocialPlatform>(prop.selected)
 
 const emit = defineEmits(['update:selected'])
-
-// todo: adds slug item on social object
-const socialList = ref<Array<Social>>([
+const socialList = ref<Array<SocialPlatform>>([
   {
     name: 'facebook',
     icon: 'cib:facebook-f'
@@ -137,7 +135,7 @@ const getSocial = (name: string) => {
   return name.includes('-') ? name.split('-').join(' ') : name
 }
 
-const onSelect = (value: Social) => {
+const onSelect = (value: SocialPlatform) => {
   selected.value = value
   emit('update:selected', value)
   toggleMenu()

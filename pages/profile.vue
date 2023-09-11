@@ -5,7 +5,7 @@
     <div class="relative hidden h-[700px] w-[40%] md:block">
       <div
         class="flex h-[700px] w-[calc(40%-16px)] items-center justify-center rounded-lg bg-base-100 p-6 md:fixed"
-        :data-theme="user.theme"
+        :data-theme="theme"
       >
         <img
           class="absolute left-1/2 -translate-x-1/2"
@@ -27,26 +27,26 @@
             >
             <div v-else class="h-28 w-28 rounded-full bg-base-300" />
             <p
-              v-if="user.name"
+              v-if="name"
               class="w-full truncate text-center font-semibold text-base-content"
             >
-              {{ user.name }}
+              {{ name }}
             </p>
             <div v-else class="h-6 w-24 rounded-full bg-base-300" />
             <p
-              v-if="user.username"
+              v-if="username"
               class="w-full truncate text-center text-base-content/60"
             >
-              {{ user.username }}
+              {{ username }}
             </p>
             <div v-else class="h-6 w-36 rounded-full bg-base-300" />
             <NuxtLink
-              v-if="user.email"
+              v-if="email"
               external
-              :href="`mailto:${user.email}`"
+              :href="`mailto:${email}`"
               class="link-neutral w-full truncate text-center"
             >
-              {{ user.email }}
+              {{ email }}
             </NuxtLink>
             <span v-else class="h-6 w-36 rounded-full bg-base-300" />
           </div>
@@ -71,7 +71,7 @@
           Deixe o seu perfil com sua cara e fale um pouco de você!
         </p>
       </div>
-      <form class="flex w-full flex-col items-start justify-center gap-6">
+      <form class="flex w-full flex-col items-start justify-center gap-6" @submit.prevent="onSubmit">
         <div class="flex w-full flex-col items-start justify-center gap-2">
           <div
             class="flex w-full flex-col items-start justify-between gap-3 rounded-md bg-base-200 p-5 md:flex-row md:items-center"
@@ -88,6 +88,7 @@
                   hidden
                   accept=".jpg, .png, .bmp"
                   type="file"
+                  name="image"
                   @input="onChange"
                 >
                 <label
@@ -124,9 +125,7 @@
                 <button v-if="fileDisplay" class="link" @click="clearImage">
                   Remover imagem
                 </button>
-                <small v-if="errorType" class="text-red-500">
-                  {{ errorType }}
-                </small>
+                <ErrorItem :error="errorType" />
               </div>
               <p>
                 A imagem deve ter até <strong>1024x1024px</strong>. <br>
@@ -140,60 +139,33 @@
           <div
             class="flex w-full flex-col items-start justify-center gap-3 rounded-md bg-base-200 p-5"
           >
-            <div
-              class="flex w-full flex-col items-start justify-between md:flex-row md:items-center"
-            >
-              <label class="label" for="name">Nome completo</label>
-              <input
-                id="name"
-                v-model="user.name"
-                required
-                type="text"
-                class="input input-bordered w-full md:w-[65%]"
-              >
-            </div>
-            <div
-              class="flex w-full flex-col items-start justify-between md:flex-row md:items-center"
-            >
-              <label class="label" for="username">Usuário</label>
-              <input
-                id="username"
-                v-model="user.username"
-                required
-                type="text"
-                class="input input-bordered w-full md:w-[65%]"
-              >
-            </div>
-            <div
-              class="flex w-full flex-col items-start justify-between md:flex-row md:items-center"
-            >
-              <label class="label" for="email">Email</label>
-              <input
-                id="email"
-                v-model="user.email"
-                required
-                type="email"
-                class="input input-bordered w-full md:w-[65%]"
-              >
-            </div>
+            <InputItem v-model="name" label="Nome completo" name="name" :is-row="true" />
+            <ErrorItem :error="errors.name" />
+            <InputItem v-model="username" label="Usuário" name="username" :is-row="true" />
+            <ErrorItem :error="errors.username" />
+            <InputItem v-model="email" label="Email" type="email" name="email" :is-row="true" />
+            <ErrorItem :error="errors.email" />
             <div
               class="flex w-full flex-col items-start justify-between md:flex-row md:items-center"
             >
               <label class="label" for="theme">Tema</label>
-              <select
-                id="theme"
-                v-model="user.theme"
-                class="input input-bordered w-full capitalize md:w-[65%]"
-              >
-                <option
-                  v-for="(themeItem, index) in themesList"
-                  :key="index"
-                  class="capitalize"
-                  :value="themeItem"
+              <div class="flex w-full flex-col items-start justify-center md:w-[65%]">
+                <select
+                  id="theme"
+                  v-model="theme"
+                  class="input input-bordered w-full capitalize"
                 >
-                  {{ themeItem }}
-                </option>
-              </select>
+                  <option
+                    v-for="(themeItem, index) in themesList"
+                    :key="index"
+                    class="capitalize"
+                    :value="themeItem"
+                  >
+                    {{ themeItem }}
+                  </option>
+                </select>
+                <small class="text-base-content">Temas baseados nos temas do <NuxtLink class="link" target="_blank" external href="https://daisyui.com/docs/themes/">DaisyUI</NuxtLink></small>
+              </div>
             </div>
           </div>
         </div>
@@ -206,7 +178,14 @@
 </template>
 
 <script lang="ts" setup>
-// TODO: Validation
+import * as zod from 'zod'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useForm, useField } from 'vee-validate'
+import { Profile } from '~/utils/types/profile'
+import { Database } from '~/utils/types/supabase'
+definePageMeta({
+  middleware: 'auth'
+})
 const themesList = ref<Array<string>>([
   'light',
   'dark',
@@ -239,17 +218,43 @@ const themesList = ref<Array<string>>([
   'winter'
 ])
 
+const profile = useProfile()
+
 useHead({
   title: 'Perfil'
 })
+const validationSchema = toTypedSchema(
+  zod.object({
+    name: zod.string({
+      required_error: 'O nome é obrigatório'
+    }).nonempty({
+      message: 'O nome é obrigatório'
+    }),
+    username: zod.string({
+      required_error: 'O usuário é obrigatório'
+    }).nonempty({
+      message: 'O nome de usuário é obrigatório'
+    }),
+    email: zod.string({
+      invalid_type_error: 'O email deve ser válido',
+      required_error: 'O email é obrigatório'
+    }).email({
+      message: 'O email deve ser válido'
+    }).nonempty({
+      message: 'O email é obrigatório'
+    })
+  })
+)
 
-const user = ref({
-  id: 1,
-  name: '',
-  username: '',
-  email: '',
-  theme: 'light'
+const { handleSubmit, errors } = useForm({
+  validationSchema
 })
+
+const { value: name } = useField<string | null>('name')
+const { value: username } = useField<string | null>('username')
+const { value: email } = useField<string | null>('email')
+const theme = ref<string>('light')
+const userAvatar = ref<string>('')
 
 const file = ref<any>(null)
 const fileDisplay = ref<string>('')
@@ -257,6 +262,7 @@ const fileData = ref<File | null>()
 const errorType = ref<string>('')
 
 const onChange = (e: any) => {
+  errorType.value = ''
   if (!e.target.files[0]) {
     return
   }
@@ -276,6 +282,7 @@ const onDrop = (e: any) => {
   }
 
   fileDisplay.value = URL.createObjectURL(e.dataTransfer.files[0])
+  fileData.value = e.dataTransfer.files[0]
 }
 
 const clearImage = () => {
@@ -283,4 +290,96 @@ const clearImage = () => {
   fileData.value = null
   file.value = null
 }
+
+const supabase = useSupabaseClient<Database>()
+
+const uploadAvatar = async () => {
+  const fileExt = fileData.value?.name.split('.').pop()
+  const filePath = fileData.value ? `${Math.random()}.${fileExt}` : ''
+  try {
+    const { error } = await supabase.storage.from('profiles').upload(filePath, fileData.value as File)
+
+    if (error) {
+      throw error
+    }
+
+    userAvatar.value = filePath
+  } catch (error: any) {
+    console.log(error)
+  }
+}
+
+const user = useSupabaseUser()
+
+const uploadUser = async (name: string, username: string, email:string, theme: string) => {
+  try {
+    const { data, error } = await supabase.from('profiles').update({
+      name,
+      username,
+      email,
+      theme,
+      avatar_url: userAvatar.value
+    }).eq('id', user.value?.id as string).select()
+    if (data) {
+      profile.setProfile(data[0] as Profile)
+    }
+    if (error) {
+      throw error
+    }
+  } catch (error: any) {
+    console.log(error)
+  }
+}
+
+const onSubmit = handleSubmit(async (values) => {
+  if (!fileDisplay.value) {
+    errorType.value = 'Selecione uma imagem'
+    return
+  }
+  if (!userAvatar.value || fileData.value) {
+    await uploadAvatar()
+  }
+  await uploadUser(values.name, values.username, values.email, theme.value)
+})
+
+const getUserData = async () => {
+  try {
+    const { data, error } = await supabase.from('profiles').select('name, username, email, theme, avatar_url').eq('id', user.value?.id as string)
+
+    if (error) {
+      throw error
+    }
+
+    if (data) {
+      name.value = data[0].name
+      username.value = data[0].username
+      email.value = data[0].email
+      theme.value = data[0].theme ?? 'light'
+      userAvatar.value = data[0].avatar_url ?? ''
+    }
+  } catch (error: any) {
+    console.log(error)
+  }
+}
+const downloadUserImage = async () => {
+  try {
+    const { data, error } = await supabase.storage.from('profiles').download(userAvatar.value)
+
+    if (error) {
+      throw error
+    }
+
+    if (data) {
+      const url = URL.createObjectURL(data)
+      fileDisplay.value = url
+    }
+  } catch (error: any) {
+    console.log(error)
+  }
+}
+
+onMounted(async () => {
+  await getUserData()
+  downloadUserImage()
+})
 </script>
