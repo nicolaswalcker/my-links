@@ -6,7 +6,7 @@
       :name="name"
       :placeholder="placeholder"
       :type="type"
-      class="input input-bordered input-ghost"
+      class="input input-bordered"
       :class="isRow ? 'w-full md:w-[65%]' : ''"
       :value="modelValue"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
@@ -19,14 +19,15 @@
 withDefaults(defineProps<{
   label: string,
   type?: 'password' | 'email' | 'text',
-  modelValue: string,
-  placeholder: string,
+  modelValue: string | null,
+  placeholder?: string,
   name: string,
   isRow?: boolean,
 }>(), {
   type: 'text',
   isRow: false,
-  modelValue: ''
+  modelValue: '',
+  placeholder: ''
 })
 
 defineEmits(['update:modelValue'])
