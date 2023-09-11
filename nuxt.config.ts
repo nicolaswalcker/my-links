@@ -5,11 +5,15 @@ export default defineNuxtConfig({
     '@nuxtjs/eslint-module',
     '@vueuse/nuxt',
     '@nuxtjs/supabase',
-    'nuxt-icon'
+    'nuxt-icon',
+    '@pinia/nuxt'
   ],
   tailwindcss: {
     cssPath: '~/assets/css/global.css',
     configPath: 'tailwind.config'
+  },
+  imports: {
+    dirs: ['./stores']
   },
   supabase: {
     redirect: false
