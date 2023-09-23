@@ -1,10 +1,10 @@
 <template>
   <section
-    class="flex h-auto min-h-[calc(100vh-88px)] w-full items-center justify-end gap-4 bg-base-200 p-4"
+    class="flex h-auto min-h-[calc(100vh-88px)] w-full items-start justify-end gap-4 bg-base-200 transition-all md:p-4"
   >
-    <div class="relative hidden h-[700px] w-[40%] md:block">
+    <div class="relative hidden w-[40%] md:block">
       <div
-        class="top-[calc(16px+88px)] flex h-[700px] w-[calc(40%-16px)] items-center justify-center rounded-lg bg-base-100 p-6 md:fixed"
+        class="flex h-full max-h-[750px] w-[calc(40%-16px)] items-center justify-center rounded-lg bg-base-100 p-6 md:fixed"
       >
         <img
           class="absolute left-1/2 -translate-x-1/2"
@@ -16,6 +16,7 @@
         >
           <div class="flex flex-col items-center justify-center gap-1">
             <div class="h-28 w-28 rounded-full bg-base-300" />
+            <img src="" alt="">
             <div class="h-6 w-24 rounded-full bg-base-300" />
             <div class="h-6 w-36 rounded-full bg-base-300" />
             <div class="h-6 w-36 rounded-full bg-base-300" />
@@ -43,7 +44,7 @@
       </div>
     </div>
     <div
-      class="flex h-full min-h-[700px] w-full flex-col items-start justify-start gap-7 rounded-lg bg-base-100 p-6 md:w-[60%]"
+      class="flex h-full w-full flex-col items-start justify-start gap-7 rounded-lg bg-base-100 p-6 md:w-[60%]"
     >
       <div class="flex flex-col items-start justify-start gap-3">
         <h1 class="text-4xl font-bold">
@@ -87,12 +88,13 @@
               :selected="item.platform"
               @update:selected="changePlatform(item.id, $event)"
             />
-            <InputItem v-model="item.link" label="Plataforma" placeholder="Insira a plataforma" :name="`input-${index}`" />
+            <InputItem v-model="item.link" label="Link" placeholder="Insira a plataforma" :name="`input-${index + 1}`" />
+            <ErrorItem v-if="!verifyUrl(item.link)" error="O URL da plataforma deve ser válido" />
           </main>
         </div>
       </div>
 
-      <button v-if="inputs.length" class="btn btn-primary self-end" @click="savePlatforms">
+      <button :disabled="!verifyAllUrls" class="btn btn-primary self-end" @click="savePlatforms">
         <Icon v-if="saving" name="svg-spinners:8-dots-rotate" size="24" />
         <span v-else>Salvar</span>
       </button>
@@ -102,6 +104,7 @@
 
 <script lang="ts" setup>
 import { Database } from '~/utils/types/supabase'
+import { Profile } from '~/utils/types/profile'
 
 useHead({
   title: 'Links',
@@ -116,6 +119,22 @@ definePageMeta({
   middleware: 'auth'
 })
 
+const verifyUrl = (url: string) => {
+  try {
+    // eslint-disable-next-line no-new
+    new URL(url)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
+const verifyAllUrls = computed(() => {
+  const urls = inputs.value.map(item => item.link)
+  const allUrls = urls.every(item => verifyUrl(item))
+  return allUrls
+})
+
 interface Input {
   id: number;
   platform: { name: string; icon: string };
@@ -124,6 +143,17 @@ interface Input {
 const inputs = ref<Array<Input>>([])
 const supabase = useSupabaseClient<Database>()
 const user = useSupabaseUser()
+
+const myUser = ref<Profile>({
+  avatar_url: '',
+  email: '',
+  id: '',
+  name: '',
+  social_links: [],
+  theme: '',
+  username: '',
+  created_at: ''
+})
 
 const saving = ref(false)
 
@@ -153,8 +183,8 @@ const changePlatform = (
   })
 }
 
-onMounted(() => {
-  getPlatforms()
+onMounted(async () => {
+  await getPlatforms()
 })
 
 const removeInput = (id: number) => {
@@ -187,15 +217,39 @@ const getPlatforms = async () => {
   try {
     const { data, error } = await supabase
       .from('profiles')
-      .select('social_links')
+      .select('social_links, username, avatar_url, theme, email, name')
       .eq('id', user.value?.id as string)
 
     if (error) { throw error }
     if (data) {
       inputs.value = data[0].social_links as any
+      myUser.value.social_links = data[0].social_links as any
+      myUser.value.avatar_url = data[0].avatar_url as string
+      myUser.value.email = data[0].email as string
+      myUser.value.name = data[0].name as string
+      myUser.value.username = data[0].username as string
+      myUser.value.theme = data[0].theme as string
     }
+
+    await downloadUserImage()
   } catch (error: any) {
     console.log(error.message)
+  }
+}
+const downloadUserImage = async () => {
+  try {
+    const { data, error } = await supabase.storage.from('profiles').download(myUser.value.avatar_url as string)
+
+    if (error) {
+      throw error
+    }
+
+    if (data) {
+      const url = URL.createObjectURL(data)
+      myUser.value.avatar_url = url
+    }
+  } catch (error: any) {
+    console.log(error)
   }
 }
 </script>

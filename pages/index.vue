@@ -1,43 +1,61 @@
 <template>
   <section
     class="flex h-[calc(100vh-88px)] w-full items-center justify-center bg-base-200 md:py-10"
+    :data-theme="profile?.theme"
   >
-    <article
-      class="flex h-full w-full flex-col items-center justify-between gap-3 rounded-md bg-base-100 p-6 md:max-h-[80%] md:max-w-[350px] md:justify-center"
-    >
-      <div class="flex w-full flex-col items-center justify-center gap-1">
-        <img
-          class="h-[96px] w-[96px] rounded-full object-cover"
-          src="https://images.pexels.com/photos/16233515/pexels-photo-16233515/free-photo-of-adobe-photoshop-adulto-atleta-esportista.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-          alt="#"
-        >
-        <p class="w-full truncate text-center font-semibold text-base-content">
-          Nicolas Walcker
-        </p>
-        <p class="w-full truncate text-center text-base-content/60">
-          @nicaomaneirao
-        </p>
-        <NuxtLink
-          external
-          href="#"
-          class="w-full truncate text-center text-base-content"
-        >
-          nicaomaneirao@gmail.com
-        </NuxtLink>
-      </div>
-      <div class="flex w-full flex-col items-center justify-center gap-4">
-        <div
-          v-for="(item, index) in 5"
-          :key="index"
-          class="h-12 min-w-[230px] rounded-sm bg-base-200"
-        />
-      </div>
-    </article>
+    <ProfileCard :profile="profile" />
   </section>
 </template>
 
 <script lang="ts" setup>
+import { Profile } from '~/utils/types/profile'
+
 definePageMeta({
   middleware: 'auth'
+})
+
+const user = useSupabaseUser()
+const supabase = useSupabaseClient()
+const profile = ref<Profile>()
+
+const getUserData = async () => {
+  try {
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', user.value?.id as string)
+
+    if (error) {
+      throw error
+    }
+
+    if (data) {
+      return data[0] as Profile
+    }
+  } catch (error: any) {
+    console.log(error)
+  }
+}
+
+const downloadUserImage = async (avatarUrl: string) => {
+  try {
+    const { data, error } = await supabase.storage.from('profiles').download(avatarUrl)
+
+    if (error) {
+      throw error
+    }
+
+    if (data) {
+      const url = URL.createObjectURL(data)
+      return url
+    }
+  } catch (error: any) {
+    console.log(error)
+  }
+}
+onMounted(async () => {
+  profile.value = await getUserData()
+
+  if (profile.value) {
+    const imageUrl = await downloadUserImage(profile.value.avatar_url as string)
+    profile.value.avatar_url = imageUrl as string
+  }
 })
 </script>

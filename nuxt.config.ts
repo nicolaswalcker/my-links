@@ -8,12 +8,15 @@ export default defineNuxtConfig({
     'nuxt-icon',
     '@pinia/nuxt'
   ],
+  imports: {
+    dirs: ['./stores']
+  },
+  pinia: {
+    autoImports: ['defineStore', 'acceptHMRUpdate']
+  },
   tailwindcss: {
     cssPath: '~/assets/css/global.css',
     configPath: 'tailwind.config'
-  },
-  imports: {
-    dirs: ['./stores']
   },
   supabase: {
     redirect: false
@@ -29,7 +32,7 @@ export default defineNuxtConfig({
     },
     pageTransition: {
       name: 'page',
-      mode: 'out-in'
+      mode: 'in-out'
     }
   },
   devtools: { enabled: true }

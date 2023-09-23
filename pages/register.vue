@@ -62,7 +62,8 @@
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
-import { useProfile } from '~/stores/profile'
+import { Profile } from '~/utils/types/profile'
+import { Database } from '~/utils/types/supabase'
 useHead({
   title: 'Criar conta'
 })
@@ -97,13 +98,11 @@ const validationSchema = toTypedSchema(
     })
 )
 
-const profile = useProfile()
-
 const { handleSubmit, errors } = useForm({
   validationSchema
 })
 
-const supabase = useSupabaseClient()
+const supabase = useSupabaseClient<Database>()
 
 const signUp = async (email: string, password: string) => {
   try {
@@ -114,10 +113,7 @@ const signUp = async (email: string, password: string) => {
     })
     if (data) {
       await insertProfile(email, data.user?.id as string)
-      profile.setProfile({
-        email,
-        id: data.user?.id as string
-      })
+      await insertSocials(data.user?.id as string)
     }
     if (error) {
       throw error
@@ -138,7 +134,21 @@ const insertProfile = async (email: string, id: string) => {
     const { error } = await supabase.from('profiles').insert({
       email,
       id
-    } as any).select('*') // TODO: type this any
+    } as Profile)
+    if (error) { throw error }
+  } catch (error: any) {
+    errorMsg.value = error.message
+    setTimeout(() => {
+      errorMsg.value = ''
+    }, 5000)
+  }
+}
+
+const insertSocials = async (id: string) => {
+  try {
+    const { error } = await supabase.from('socials').insert({
+      id
+    })
     if (error) { throw error }
   } catch (error: any) {
     errorMsg.value = error.message
@@ -155,7 +165,7 @@ const onSubmit = handleSubmit((values) => {
   signUp(values.email, values.password)
 })
 
-const { value: email } = useField<string>('email')
+const { value: email } = useField<string | null>('email')
 const { value: password } = useField<string>('password')
 const { value: confirm } = useField<string>('confirm')
 </script>

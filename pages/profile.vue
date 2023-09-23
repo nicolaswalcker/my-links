@@ -1,10 +1,10 @@
 <template>
   <section
-    class="flex h-auto min-h-[calc(100vh-88px)] w-full items-center justify-end gap-4 bg-base-200 p-4 transition-all"
+    class="flex h-auto min-h-[calc(100vh-88px)] w-full items-start justify-end gap-4 bg-base-200 transition-all md:p-4"
   >
-    <div class="relative hidden h-[700px] w-[40%] md:block">
+    <div class="relative hidden w-[40%] md:block">
       <div
-        class="flex h-[700px] w-[calc(40%-16px)] items-center justify-center rounded-lg bg-base-100 p-6 md:fixed"
+        class="flex h-full max-h-[750px] w-[calc(40%-16px)] items-center justify-center rounded-lg bg-base-100 p-6 md:fixed"
         :data-theme="theme"
       >
         <img
@@ -44,7 +44,7 @@
               v-if="email"
               external
               :href="`mailto:${email}`"
-              class="link-neutral w-full truncate text-center"
+              class="link-success w-full truncate text-center"
             >
               {{ email }}
             </NuxtLink>
@@ -61,7 +61,7 @@
       </div>
     </div>
     <div
-      class="flex h-full min-h-[700px] w-full flex-col items-start justify-start gap-7 rounded-lg bg-base-100 p-6 md:w-[60%]"
+      class="flex h-full w-full flex-col items-start justify-start gap-7 rounded-lg bg-base-100 p-6 md:w-[60%]"
     >
       <div class="flex flex-col items-start justify-start gap-3">
         <h1 class="text-4xl font-bold">
@@ -218,8 +218,6 @@ const themesList = ref<Array<string>>([
   'winter'
 ])
 
-const profile = useProfile()
-
 useHead({
   title: 'Perfil'
 })
@@ -313,16 +311,13 @@ const user = useSupabaseUser()
 
 const uploadUser = async (name: string, username: string, email:string, theme: string) => {
   try {
-    const { data, error } = await supabase.from('profiles').update({
+    const { error } = await supabase.from('profiles').update({
       name,
       username,
       email,
       theme,
       avatar_url: userAvatar.value
     }).eq('id', user.value?.id as string).select()
-    if (data) {
-      profile.setProfile(data[0] as Profile)
-    }
     if (error) {
       throw error
     }

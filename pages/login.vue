@@ -105,7 +105,7 @@ const remember = useStorage('remember', false)
 const signIn = async (email: string, password: string) => {
   try {
     loading.value = true
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password
     })

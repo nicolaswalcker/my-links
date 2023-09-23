@@ -12,31 +12,31 @@ export interface Database {
       profiles: {
         Row: {
           avatar_url: string | null
-          created_at: string
+          created_at: string | null
           email: string | null
           id: string
           name: string | null
-          social_links: Json[] | null
+          social_links: Json[]
           theme: string | null
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
-          created_at?: string
+          created_at?: string | null
           email?: string | null
           id: string
           name?: string | null
-          social_links?: Json[] | null
+          social_links?: Json[]
           theme?: string | null
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
-          created_at?: string
+          created_at?: string | null
           email?: string | null
           id?: string
           name?: string | null
-          social_links?: Json[] | null
+          social_links?: Json[]
           theme?: string | null
           username?: string | null
         }
@@ -45,34 +45,6 @@ export interface Database {
             foreignKeyName: 'profiles_id_fkey'
             columns: ['id']
             referencedRelation: 'users'
-            referencedColumns: ['id']
-          }
-        ]
-      }
-      socials: {
-        Row: {
-          icon: string | null
-          id: string
-          link: string | null
-          name: string | null
-        }
-        Insert: {
-          icon?: string | null
-          id: string
-          link?: string | null
-          name?: string | null
-        }
-        Update: {
-          icon?: string | null
-          id?: string
-          link?: string | null
-          name?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'socials_id_fkey'
-            columns: ['id']
-            referencedRelation: 'profiles'
             referencedColumns: ['id']
           }
         ]
