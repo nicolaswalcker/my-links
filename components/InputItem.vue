@@ -1,33 +1,45 @@
 <template>
-  <div class="form-control w-full justify-between gap-1" :class="isRow ? 'md:flex-row md:items-center' : ''">
-    <label class="label" :for="name">{{ label }}</label>
+  <div :class="{'md:flex-row md:items-center': isRow}">
+    <label :for="name">{{ label }}</label>
     <input
-      :id="name"
-      :name="name"
-      :placeholder="placeholder"
       :type="type"
-      class="input input-bordered"
-      :class="isRow ? 'w-full md:w-[65%]' : ''"
       :value="modelValue"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+      :placeholder="placeholder"
+      :name="name"
+      @input="$emit('update:modelValue', $event.target.value)"
     >
     <slot />
   </div>
 </template>
 
-<script lang="ts" setup>
-withDefaults(defineProps<{
-  label: string,
-  type?: 'password' | 'email' | 'text',
-  modelValue: string | null,
-  placeholder?: string,
-  name: string,
-  isRow?: boolean,
-}>(), {
-  type: 'text',
-  isRow: false,
-  modelValue: '',
-  placeholder: ''
+<script setup>
+import { defineProps, defineEmits } from 'vue'
+
+defineProps({
+  label: {
+    type: String,
+    default: ''
+  },
+  type: {
+    type: String,
+    default: 'text'
+  },
+  modelValue: {
+    type: String,
+    default: ''
+  },
+  placeholder: {
+    type: String,
+    default: ''
+  },
+  name: {
+    type: String,
+    default: ''
+  },
+  isRow: {
+    type: Boolean,
+    default: false
+  }
 })
 
 defineEmits(['update:modelValue'])

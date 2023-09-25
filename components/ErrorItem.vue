@@ -4,10 +4,11 @@
   </span>
 </template>
 
-<script lang="ts" setup>
-withDefaults(defineProps<{
-  error: string
-}>(), {
-  error: ''
+<script setup>
+defineProps({
+  error: {
+    type: String,
+    default: ''
+  }
 })
 </script>

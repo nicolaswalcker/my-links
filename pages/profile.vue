@@ -177,16 +177,13 @@
   </section>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import * as zod from 'zod'
-import { toTypedSchema } from '@vee-validate/zod'
 import { useForm, useField } from 'vee-validate'
-import { Profile } from '~/utils/types/profile'
-import { Database } from '~/utils/types/supabase'
 definePageMeta({
   middleware: 'auth'
 })
-const themesList = ref<Array<string>>([
+const themesList = ref([
   'light',
   'dark',
   'cupcake',
@@ -221,7 +218,7 @@ const themesList = ref<Array<string>>([
 useHead({
   title: 'Perfil'
 })
-const validationSchema = toTypedSchema(
+const validationSchema =
   zod.object({
     name: zod.string({
       required_error: 'O nome é obrigatório'
@@ -242,24 +239,23 @@ const validationSchema = toTypedSchema(
       message: 'O email é obrigatório'
     })
   })
-)
 
 const { handleSubmit, errors } = useForm({
   validationSchema
 })
 
-const { value: name } = useField<string | null>('name')
-const { value: username } = useField<string | null>('username')
-const { value: email } = useField<string | null>('email')
-const theme = ref<string>('light')
-const userAvatar = ref<string>('')
+const { value: name } = useField('name')
+const { value: username } = useField('username')
+const { value: email } = useField('email')
+const theme = ref('light')
+const userAvatar = ref('')
 
-const file = ref<any>(null)
-const fileDisplay = ref<string>('')
-const fileData = ref<File | null>()
-const errorType = ref<string>('')
+const file = ref(null)
+const fileDisplay = ref('')
+const fileData = ref()
+const errorType = ref('')
 
-const onChange = (e: any) => {
+const onChange = (e) => {
   errorType.value = ''
   if (!e.target.files[0]) {
     return
@@ -268,7 +264,7 @@ const onChange = (e: any) => {
   fileData.value = e.target.files[0]
 }
 
-const onDrop = (e: any) => {
+const onDrop = (e) => {
   errorType.value = ''
   file.value = e.dataTransfer.files[0]
   const extention = file.value.name.substring(
@@ -289,27 +285,27 @@ const clearImage = () => {
   file.value = null
 }
 
-const supabase = useSupabaseClient<Database>()
+const supabase = useSupabaseClient()
 
 const uploadAvatar = async () => {
   const fileExt = fileData.value?.name.split('.').pop()
   const filePath = fileData.value ? `${Math.random()}.${fileExt}` : ''
   try {
-    const { error } = await supabase.storage.from('profiles').upload(filePath, fileData.value as File)
+    const { error } = await supabase.storage.from('profiles').upload(filePath, fileData.value)
 
     if (error) {
       throw error
     }
 
     userAvatar.value = filePath
-  } catch (error: any) {
+  } catch (error) {
     console.log(error)
   }
 }
 
 const user = useSupabaseUser()
 
-const uploadUser = async (name: string, username: string, email:string, theme: string) => {
+const uploadUser = async (name, username, email, theme) => {
   try {
     const { error } = await supabase.from('profiles').update({
       name,
@@ -317,11 +313,11 @@ const uploadUser = async (name: string, username: string, email:string, theme: s
       email,
       theme,
       avatar_url: userAvatar.value
-    }).eq('id', user.value?.id as string).select()
+    }).eq('id', user.value?.id).select()
     if (error) {
       throw error
     }
-  } catch (error: any) {
+  } catch (error) {
     console.log(error)
   }
 }
@@ -339,7 +335,7 @@ const onSubmit = handleSubmit(async (values) => {
 
 const getUserData = async () => {
   try {
-    const { data, error } = await supabase.from('profiles').select('name, username, email, theme, avatar_url').eq('id', user.value?.id as string)
+    const { data, error } = await supabase.from('profiles').select('name, username, email, theme, avatar_url').eq('id', user.value?.id)
 
     if (error) {
       throw error
@@ -352,7 +348,7 @@ const getUserData = async () => {
       theme.value = data[0].theme ?? 'light'
       userAvatar.value = data[0].avatar_url ?? ''
     }
-  } catch (error: any) {
+  } catch (error) {
     console.log(error)
   }
 }
@@ -368,7 +364,7 @@ const downloadUserImage = async () => {
       const url = URL.createObjectURL(data)
       fileDisplay.value = url
     }
-  } catch (error: any) {
+  } catch (error) {
     console.log(error)
   }
 }

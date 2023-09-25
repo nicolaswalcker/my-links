@@ -48,7 +48,7 @@
   </main>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { breakpointsTailwind } from '@vueuse/core'
 const breakpoints = useBreakpoints(breakpointsTailwind)
 

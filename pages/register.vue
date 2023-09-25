@@ -58,12 +58,9 @@
   </section>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { useForm, useField } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
-import { Profile } from '~/utils/types/profile'
-import { Database } from '~/utils/types/supabase'
 useHead({
   title: 'Criar conta'
 })
@@ -71,7 +68,7 @@ definePageMeta({
   layout: false
 })
 const route = useRouter()
-const validationSchema = toTypedSchema(
+const validationSchema =
   zod
     .object({
       email: zod
@@ -96,15 +93,14 @@ const validationSchema = toTypedSchema(
       message: 'As senhas não coincidem',
       path: ['confirm']
     })
-)
 
 const { handleSubmit, errors } = useForm({
   validationSchema
 })
 
-const supabase = useSupabaseClient<Database>()
+const supabase = useSupabaseClient()
 
-const signUp = async (email: string, password: string) => {
+const signUp = async (email, password) => {
   try {
     loading.value = true
     const { data, error } = await supabase.auth.signUp({
@@ -112,14 +108,14 @@ const signUp = async (email: string, password: string) => {
       password
     })
     if (data) {
-      await insertProfile(email, data.user?.id as string)
-      await insertSocials(data.user?.id as string)
+      await insertProfile(email, data.user?.id)
+      await insertSocials(data.user?.id)
     }
     if (error) {
       throw error
     }
     await route.push('/')
-  } catch (error: any) {
+  } catch (error) {
     errorMsg.value = error.message
     setTimeout(() => {
       errorMsg.value = ''
@@ -129,14 +125,14 @@ const signUp = async (email: string, password: string) => {
   }
 }
 
-const insertProfile = async (email: string, id: string) => {
+const insertProfile = async (email, id) => {
   try {
     const { error } = await supabase.from('profiles').insert({
       email,
       id
-    } as Profile)
+    })
     if (error) { throw error }
-  } catch (error: any) {
+  } catch (error) {
     errorMsg.value = error.message
     setTimeout(() => {
       errorMsg.value = ''
@@ -144,13 +140,13 @@ const insertProfile = async (email: string, id: string) => {
   }
 }
 
-const insertSocials = async (id: string) => {
+const insertSocials = async (id) => {
   try {
     const { error } = await supabase.from('socials').insert({
       id
     })
     if (error) { throw error }
-  } catch (error: any) {
+  } catch (error) {
     errorMsg.value = error.message
     setTimeout(() => {
       errorMsg.value = ''
@@ -165,7 +161,7 @@ const onSubmit = handleSubmit((values) => {
   signUp(values.email, values.password)
 })
 
-const { value: email } = useField<string | null>('email')
-const { value: password } = useField<string>('password')
-const { value: confirm } = useField<string>('confirm')
+const { value: email } = useField('email')
+const { value: password } = useField('password')
+const { value: confirm } = useField('confirm')
 </script>

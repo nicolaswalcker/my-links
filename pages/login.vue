@@ -62,9 +62,8 @@
   </section>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { useForm, useField } from 'vee-validate'
-import { toTypedSchema } from '@vee-validate/zod'
 import * as zod from 'zod'
 import { useStorage } from '@vueuse/core'
 useHead({
@@ -74,21 +73,19 @@ definePageMeta({
   layout: false
 })
 
-const validationSchema = toTypedSchema(
-  zod.object({
-    email: zod
-      .string({
-        required_error: 'O email é obrigatório'
-      })
-      .nonempty({ message: 'O email é obrigatório' })
-      .email({ message: 'O email deve ser válido' }),
-    password: zod
-      .string({
-        required_error: 'A senha é obrigatória'
-      })
-      .nonempty({ message: 'A senha é obrigatória' })
-  })
-)
+const validationSchema = zod.object({
+  email: zod
+    .string({
+      required_error: 'O email é obrigatório'
+    })
+    .nonempty({ message: 'O email é obrigatório' })
+    .email({ message: 'O email deve ser válido' }),
+  password: zod
+    .string({
+      required_error: 'A senha é obrigatória'
+    })
+    .nonempty({ message: 'A senha é obrigatória' })
+})
 
 const { handleSubmit, errors } = useForm({
   validationSchema
@@ -98,11 +95,11 @@ const supabase = useSupabaseClient()
 const errorMsg = ref('')
 const loading = ref(false)
 const router = useRouter()
-const { value: email } = useField<string>('email')
-const { value: password } = useField<string>('password')
+const { value: email } = useField('email')
+const { value: password } = useField('password')
 const remember = useStorage('remember', false)
 
-const signIn = async (email: string, password: string) => {
+const signIn = async (email, password) => {
   try {
     loading.value = true
     const { error } = await supabase.auth.signInWithPassword({
@@ -114,7 +111,7 @@ const signIn = async (email: string, password: string) => {
     }
 
     await router.push('/')
-  } catch (error: any) {
+  } catch (error) {
     errorMsg.value = error.message
   } finally {
     if (remember.value) {

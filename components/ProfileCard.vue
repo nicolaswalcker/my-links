@@ -25,7 +25,7 @@
       <SkeletonLoading v-else class="h-6 w-4/5" />
       <div class="mt-3 flex w-full flex-col items-center justify-center gap-4">
         <NuxtLink
-          v-for="item in (profile?.social_links as any)"
+          v-for="item in (profile?.social_links)"
           :key="item?.id"
           class="btn btn-wide z-20"
           :href="item?.link"
@@ -47,11 +47,13 @@
   </article>
 </template>
 
-<script lang="ts" setup>
-import { Profile } from '~/utils/types/profile'
-const props = defineProps<{
-  profile: Profile | undefined
-}>()
+<script setup>
+const props = defineProps({
+  profile: {
+    type: Object,
+    required: true
+  }
+})
 
 const socialsLength = computed(() => props.profile?.social_links.length ?? 0)
 </script>

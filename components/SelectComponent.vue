@@ -49,26 +49,26 @@
   </div>
 </template>
 
-<script lang="ts" setup>
-import { type SocialPlatform } from '@/utils/types/social'
+<script setup>
 const menu = ref(false)
 const toggleMenu = () => {
   menu.value = !menu.value
 }
 
-const prop = withDefaults(defineProps<{
-  selected: SocialPlatform
-}>(), {
-  selected: () => ({
-    name: 'facebook',
-    icon: 'cib:facebook-f'
-  })
+const prop = defineProps({
+  selected: {
+    type: Object,
+    default: () => ({
+      name: 'facebook',
+      icon: 'cib:facebook-f'
+    })
+  }
 })
 
-const selected = ref<SocialPlatform>(prop.selected)
+const selected = ref(prop.selected)
 
 const emit = defineEmits(['update:selected'])
-const socialList = ref<Array<SocialPlatform>>([
+const socialList = ref([
   {
     name: 'facebook',
     icon: 'cib:facebook-f'
@@ -131,11 +131,11 @@ const socialList = ref<Array<SocialPlatform>>([
   }
 ])
 
-const getSocial = (name: string) => {
+const getSocial = (name) => {
   return name.includes('-') ? name.split('-').join(' ') : name
 }
 
-const onSelect = (value: SocialPlatform) => {
+const onSelect = (value) => {
   selected.value = value
   emit('update:selected', value)
   toggleMenu()

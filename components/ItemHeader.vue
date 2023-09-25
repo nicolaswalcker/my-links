@@ -10,13 +10,12 @@
   </header>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 defineEmits(['delete:item'])
-defineProps<{
-  number: number
-}>()
+defineProps({
+  number: {
+    type: Number,
+    required: true
+  }
+})
 </script>
-
-<style>
-
-</style>

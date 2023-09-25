@@ -102,10 +102,7 @@
   </section>
 </template>
 
-<script lang="ts" setup>
-import { Database } from '~/utils/types/supabase'
-import { Profile } from '~/utils/types/profile'
-
+<script setup>
 useHead({
   title: 'Links',
   meta: [
@@ -119,7 +116,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const verifyUrl = (url: string) => {
+const verifyUrl = (url) => {
   try {
     // eslint-disable-next-line no-new
     new URL(url)
@@ -135,16 +132,11 @@ const verifyAllUrls = computed(() => {
   return allUrls
 })
 
-interface Input {
-  id: number;
-  platform: { name: string; icon: string };
-  link: string;
-}
-const inputs = ref<Array<Input>>([])
-const supabase = useSupabaseClient<Database>()
+const inputs = ref([])
+const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
-const myUser = ref<Profile>({
+const myUser = ({
   avatar_url: '',
   email: '',
   id: '',
@@ -169,11 +161,8 @@ const addInput = () => {
 }
 
 const changePlatform = (
-  id: number,
-  value: {
-    name: string;
-    icon: string;
-  }
+  id,
+  value
 ) => {
   inputs.value = inputs.value.map((item) => {
     if (item.id === id) {
@@ -187,7 +176,7 @@ onMounted(async () => {
   await getPlatforms()
 })
 
-const removeInput = (id: number) => {
+const removeInput = (id) => {
   inputs.value = inputs.value.filter(item => item.id !== id)
 }
 
@@ -199,14 +188,14 @@ const savePlatforms = async () => {
       .update({
         social_links: inputs.value
       })
-      .eq('id', user.value?.id as string).select('social_links')
+      .eq('id', user.value?.id).select('social_links')
 
     if (data) {
-      inputs.value = data[0].social_links as any
+      inputs.value = data[0].social_links
     }
 
     if (error) { throw error }
-  } catch (error: any) {
+  } catch (error) {
     throw error.message
   } finally {
     saving.value = false
@@ -218,27 +207,27 @@ const getPlatforms = async () => {
     const { data, error } = await supabase
       .from('profiles')
       .select('social_links, username, avatar_url, theme, email, name')
-      .eq('id', user.value?.id as string)
+      .eq('id', user.value?.id)
 
     if (error) { throw error }
     if (data) {
-      inputs.value = data[0].social_links as any
-      myUser.value.social_links = data[0].social_links as any
-      myUser.value.avatar_url = data[0].avatar_url as string
-      myUser.value.email = data[0].email as string
-      myUser.value.name = data[0].name as string
-      myUser.value.username = data[0].username as string
-      myUser.value.theme = data[0].theme as string
+      inputs.value = data[0].social_links
+      myUser.value.social_links = data[0].social_links
+      myUser.value.avatar_url = data[0].avatar_url
+      myUser.value.email = data[0].email
+      myUser.value.name = data[0].name
+      myUser.value.username = data[0].username
+      myUser.value.theme = data[0].theme
     }
 
     await downloadUserImage()
-  } catch (error: any) {
+  } catch (error) {
     console.log(error.message)
   }
 }
 const downloadUserImage = async () => {
   try {
-    const { data, error } = await supabase.storage.from('profiles').download(myUser.value.avatar_url as string)
+    const { data, error } = await supabase.storage.from('profiles').download(myUser.value.avatar_url)
 
     if (error) {
       throw error
@@ -248,7 +237,7 @@ const downloadUserImage = async () => {
       const url = URL.createObjectURL(data)
       myUser.value.avatar_url = url
     }
-  } catch (error: any) {
+  } catch (error) {
     console.log(error)
   }
 }

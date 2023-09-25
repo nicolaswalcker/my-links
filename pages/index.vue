@@ -7,8 +7,7 @@
   </section>
 </template>
 
-<script lang="ts" setup>
-import { Profile } from '~/utils/types/profile'
+<script setup>
 
 definePageMeta({
   middleware: 'auth'
@@ -16,25 +15,25 @@ definePageMeta({
 
 const user = useSupabaseUser()
 const supabase = useSupabaseClient()
-const profile = ref<Profile>()
+const profile = ref()
 
 const getUserData = async () => {
   try {
-    const { data, error } = await supabase.from('profiles').select('*').eq('id', user.value?.id as string)
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', user.value?.id)
 
     if (error) {
       throw error
     }
 
     if (data) {
-      return data[0] as Profile
+      return data[0]
     }
-  } catch (error: any) {
+  } catch (error) {
     console.log(error)
   }
 }
 
-const downloadUserImage = async (avatarUrl: string) => {
+const downloadUserImage = async (avatarUrl) => {
   try {
     const { data, error } = await supabase.storage.from('profiles').download(avatarUrl)
 
@@ -46,7 +45,7 @@ const downloadUserImage = async (avatarUrl: string) => {
       const url = URL.createObjectURL(data)
       return url
     }
-  } catch (error: any) {
+  } catch (error) {
     console.log(error)
   }
 }
@@ -54,8 +53,8 @@ onMounted(async () => {
   profile.value = await getUserData()
 
   if (profile.value) {
-    const imageUrl = await downloadUserImage(profile.value.avatar_url as string)
-    profile.value.avatar_url = imageUrl as string
+    const imageUrl = await downloadUserImage(profile.value.avatar_url)
+    profile.value.avatar_url = imageUrl
   }
 })
 </script>
