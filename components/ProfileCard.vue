@@ -51,7 +51,7 @@
 const props = defineProps({
   profile: {
     type: Object,
-    required: true
+    default: null
   }
 })
 

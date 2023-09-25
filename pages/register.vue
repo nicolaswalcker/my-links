@@ -61,6 +61,7 @@
 <script setup>
 import { useForm, useField } from 'vee-validate'
 import * as zod from 'zod'
+import { toTypedSchema } from '@vee-validate/zod'
 useHead({
   title: 'Criar conta'
 })
@@ -68,7 +69,7 @@ definePageMeta({
   layout: false
 })
 const route = useRouter()
-const validationSchema =
+const validationSchema = toTypedSchema(
   zod
     .object({
       email: zod
@@ -93,6 +94,7 @@ const validationSchema =
       message: 'As senhas não coincidem',
       path: ['confirm']
     })
+)
 
 const { handleSubmit, errors } = useForm({
   validationSchema
@@ -131,7 +133,9 @@ const insertProfile = async (email, id) => {
       email,
       id
     })
-    if (error) { throw error }
+    if (error) {
+      throw error
+    }
   } catch (error) {
     errorMsg.value = error.message
     setTimeout(() => {
@@ -145,7 +149,9 @@ const insertSocials = async (id) => {
     const { error } = await supabase.from('socials').insert({
       id
     })
-    if (error) { throw error }
+    if (error) {
+      throw error
+    }
   } catch (error) {
     errorMsg.value = error.message
     setTimeout(() => {

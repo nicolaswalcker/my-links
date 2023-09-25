@@ -1,11 +1,12 @@
 <template>
-  <div :class="{'md:flex-row md:items-center': isRow}">
-    <label :for="name">{{ label }}</label>
+  <div class="form-control w-full justify-between gap-1" :class="{'md:flex-row md:items-center': isRow}">
+    <label class="label" :for="name">{{ label }}</label>
     <input
       :type="type"
       :value="modelValue"
       :placeholder="placeholder"
       :name="name"
+      class="input input-bordered"
       @input="$emit('update:modelValue', $event.target.value)"
     >
     <slot />

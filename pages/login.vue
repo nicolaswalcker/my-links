@@ -65,6 +65,7 @@
 <script setup>
 import { useForm, useField } from 'vee-validate'
 import * as zod from 'zod'
+import { toTypedSchema } from '@vee-validate/zod'
 import { useStorage } from '@vueuse/core'
 useHead({
   title: 'Entrar'
@@ -73,19 +74,21 @@ definePageMeta({
   layout: false
 })
 
-const validationSchema = zod.object({
-  email: zod
-    .string({
-      required_error: 'O email é obrigatório'
-    })
-    .nonempty({ message: 'O email é obrigatório' })
-    .email({ message: 'O email deve ser válido' }),
-  password: zod
-    .string({
-      required_error: 'A senha é obrigatória'
-    })
-    .nonempty({ message: 'A senha é obrigatória' })
-})
+const validationSchema = toTypedSchema(
+  zod.object({
+    email: zod
+      .string({
+        required_error: 'O email é obrigatório'
+      })
+      .nonempty({ message: 'O email é obrigatório' })
+      .email({ message: 'O email deve ser válido' }),
+    password: zod
+      .string({
+        required_error: 'A senha é obrigatória'
+      })
+      .nonempty({ message: 'A senha é obrigatória' })
+  })
+)
 
 const { handleSubmit, errors } = useForm({
   validationSchema

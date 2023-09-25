@@ -180,6 +180,7 @@
 <script setup>
 import * as zod from 'zod'
 import { useForm, useField } from 'vee-validate'
+import { toTypedSchema } from '@vee-validate/zod'
 definePageMeta({
   middleware: 'auth'
 })
@@ -218,27 +219,26 @@ const themesList = ref([
 useHead({
   title: 'Perfil'
 })
-const validationSchema =
-  zod.object({
-    name: zod.string({
-      required_error: 'O nome é obrigatório'
-    }).nonempty({
-      message: 'O nome é obrigatório'
-    }),
-    username: zod.string({
-      required_error: 'O usuário é obrigatório'
-    }).nonempty({
-      message: 'O nome de usuário é obrigatório'
-    }),
-    email: zod.string({
-      invalid_type_error: 'O email deve ser válido',
-      required_error: 'O email é obrigatório'
-    }).email({
-      message: 'O email deve ser válido'
-    }).nonempty({
-      message: 'O email é obrigatório'
-    })
+const validationSchema = toTypedSchema(zod.object({
+  name: zod.string({
+    required_error: 'O nome é obrigatório'
+  }).nonempty({
+    message: 'O nome é obrigatório'
+  }),
+  username: zod.string({
+    required_error: 'O usuário é obrigatório'
+  }).nonempty({
+    message: 'O nome de usuário é obrigatório'
+  }),
+  email: zod.string({
+    invalid_type_error: 'O email deve ser válido',
+    required_error: 'O email é obrigatório'
+  }).email({
+    message: 'O email deve ser válido'
+  }).nonempty({
+    message: 'O email é obrigatório'
   })
+}))
 
 const { handleSubmit, errors } = useForm({
   validationSchema
