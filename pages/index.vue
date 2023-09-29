@@ -3,7 +3,7 @@
     class="flex h-[calc(100vh-88px)] w-full items-center justify-center bg-base-200 md:py-10"
     :data-theme="profile?.theme"
   >
-    <ProfileCard :profile="profile" />
+    <ProfileCard :profile-name="profile?.name" :profile-email="profile?.email" :profile-username="profile?.username" :profile-avatar="profile?.avatar_url" :social-links="profile?.social_links" />
   </section>
 </template>
 

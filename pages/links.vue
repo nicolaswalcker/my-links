@@ -6,40 +6,15 @@
       <div
         class="flex h-full max-h-[750px] w-[calc(40%-16px)] items-center justify-center rounded-lg bg-base-100 p-6 md:fixed"
       >
-        <img
-          class="absolute left-1/2 -translate-x-1/2"
-          src="@/assets/images/illustration-phone-mockup.svg"
-          alt="Ilustração de telefone"
-        >
-        <div
-          class="z-10 flex h-full w-full flex-col items-center justify-center gap-8"
-        >
-          <div class="flex flex-col items-center justify-center gap-1">
-            <div class="h-28 w-28 rounded-full bg-base-300" />
-            <img src="" alt="">
-            <div class="h-6 w-24 rounded-full bg-base-300" />
-            <div class="h-6 w-36 rounded-full bg-base-300" />
-            <div class="h-6 w-36 rounded-full bg-base-300" />
-          </div>
-          <div class="flex w-full flex-col items-center justify-center gap-4">
-            <a
-              v-for="item in inputs"
-              :key="item.id"
-              class="z-20 flex h-12 min-w-[230px] cursor-pointer items-center justify-center gap-3 rounded-lg border border-base-content bg-base-100 transition-colors hover:border-primary hover:bg-primary hover:text-base-100"
-              :href="item.link"
-              target="_blank"
-            >
-              <Icon :name="item.platform.icon" size="24" />
-              <p class="first-letter:capitalize">
-                {{ item.platform.name }}
-              </p>
-            </a>
-            <div
-              v-for="(item, index) in 5 - inputs.length"
-              :key="index"
-              class="h-12 min-w-[230px] rounded-sm bg-base-300"
-            />
-          </div>
+        <div class="absolute left-1/2 -translate-x-1/2">
+          <ProfileCard
+            :profile-name="profile?.name"
+            :profile-email="profile?.email"
+            :profile-username="profile?.username"
+            :profile-avatar="profile?.avatar_url"
+            :social-links="inputs"
+            :profile-theme="profile?.theme"
+          />
         </div>
       </div>
     </div>
@@ -136,7 +111,7 @@ const inputs = ref([])
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
 
-const myUser = ({
+const profile = ref({
   avatar_url: '',
   email: '',
   id: '',
@@ -212,12 +187,10 @@ const getPlatforms = async () => {
     if (error) { throw error }
     if (data) {
       inputs.value = data[0].social_links
-      myUser.value.social_links = data[0].social_links
-      myUser.value.avatar_url = data[0].avatar_url
-      myUser.value.email = data[0].email
-      myUser.value.name = data[0].name
-      myUser.value.username = data[0].username
-      myUser.value.theme = data[0].theme
+      profile.value = {
+        ...data[0]
+      }
+      profile.value.social_links = inputs.value
     }
 
     await downloadUserImage()
@@ -227,7 +200,7 @@ const getPlatforms = async () => {
 }
 const downloadUserImage = async () => {
   try {
-    const { data, error } = await supabase.storage.from('profiles').download(myUser.value.avatar_url)
+    const { data, error } = await supabase.storage.from('profiles').download(profile.value.avatar_url)
 
     if (error) {
       throw error
@@ -235,7 +208,7 @@ const downloadUserImage = async () => {
 
     if (data) {
       const url = URL.createObjectURL(data)
-      myUser.value.avatar_url = url
+      profile.value.avatar_url = url
     }
   } catch (error) {
     console.log(error)

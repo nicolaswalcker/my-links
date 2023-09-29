@@ -5,15 +5,8 @@ export default defineNuxtConfig({
     '@nuxtjs/eslint-module',
     '@vueuse/nuxt',
     '@nuxtjs/supabase',
-    'nuxt-icon',
-    '@pinia/nuxt'
+    'nuxt-icon'
   ],
-  imports: {
-    dirs: ['./stores']
-  },
-  pinia: {
-    autoImports: ['defineStore', 'acceptHMRUpdate']
-  },
   tailwindcss: {
     cssPath: '~/assets/css/global.css',
     configPath: 'tailwind.config'

@@ -1,31 +1,31 @@
 <template>
   <article
     class="flex h-full w-full flex-col items-center justify-between gap-3 rounded-md bg-base-100 p-6 md:max-h-[80%] md:max-w-[350px] md:justify-center"
-    :data-theme="profile?.theme"
+    :data-theme="profileTheme"
   >
     <div class="flex w-full flex-col items-center justify-center gap-1">
-      <img v-if="profile?.avatar_url" :src="profile?.avatar_url" :alt="`Imagem de perfil de ${profile?.name}`" class="h-24 w-24 rounded-full object-cover">
+      <img v-if="profileAvatar" :src="profileAvatar" :alt="`Imagem de perfil de ${profileName}`" class="h-24 w-24 rounded-full object-cover">
       <SkeletonLoading v-else class="h-24 w-24" />
-      <p v-if="profile?.name" class="w-4/5 truncate text-center font-semibold text-base-content">
-        {{ profile?.name }}
+      <p v-if="profileName" class="w-4/5 truncate text-center font-semibold text-base-content">
+        {{ profileName }}
       </p>
       <SkeletonLoading v-else class="h-6 w-4/5" />
-      <p v-if="profile?.username" class="w-3/5 truncate text-center text-base-content/60">
-        @{{ profile?.username }}
+      <p v-if="profileUsername" class="w-3/5 truncate text-center text-base-content/60">
+        @{{ profileUsername }}
       </p>
       <SkeletonLoading v-else class="h-6 w-3/5" />
       <NuxtLink
-        v-if="profile?.email"
+        v-if="profileEmail"
         external
-        :href="`mailto:${profile?.email}`"
+        :href="`mailto:${profileEmail}`"
         class="w-full truncate text-center text-base-content"
       >
-        {{ profile?.email }}
+        {{ profileEmail }}
       </NuxtLink>
       <SkeletonLoading v-else class="h-6 w-4/5" />
       <div class="mt-3 flex w-full flex-col items-center justify-center gap-4">
         <NuxtLink
-          v-for="item in (profile?.social_links)"
+          v-for="item in (socialLinks)"
           :key="item?.id"
           class="btn btn-wide z-20"
           :href="item?.link"
@@ -49,11 +49,31 @@
 
 <script setup>
 const props = defineProps({
-  profile: {
-    type: Object,
-    default: null
+  socialLinks: {
+    type: Array,
+    default: () => []
+  },
+  profileAvatar: {
+    type: String,
+    default: ''
+  },
+  profileName: {
+    type: String,
+    default: ''
+  },
+  profileUsername: {
+    type: String,
+    default: ''
+  },
+  profileEmail: {
+    type: String,
+    default: ''
+  },
+  profileTheme: {
+    type: String,
+    default: ''
   }
 })
 
-const socialsLength = computed(() => props.profile?.social_links.length ?? 0)
+const socialsLength = computed(() => props.socialLinks.length ?? 0)
 </script>

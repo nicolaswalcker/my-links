@@ -5,58 +5,16 @@
     <div class="relative hidden w-[40%] md:block">
       <div
         class="flex h-full max-h-[750px] w-[calc(40%-16px)] items-center justify-center rounded-lg bg-base-100 p-6 md:fixed"
-        :data-theme="theme"
       >
-        <img
-          class="absolute left-1/2 -translate-x-1/2"
-          src="@/assets/images/illustration-phone-mockup.svg"
-          aria-hidden="true"
-          alt="Ilustração de um celular"
-        >
-        <div
-          class="z-10 flex h-full w-full max-w-[300px] flex-col items-center justify-center gap-8"
-        >
-          <div
-            class="flex w-full flex-col items-center justify-center gap-1 overflow-hidden px-6"
-          >
-            <img
-              v-if="fileDisplay"
-              class="h-28 w-28 rounded-full object-cover"
-              :src="fileDisplay"
-              alt="aa"
-            >
-            <div v-else class="h-28 w-28 rounded-full bg-base-300" />
-            <p
-              v-if="name"
-              class="w-full truncate text-center font-semibold text-base-content"
-            >
-              {{ name }}
-            </p>
-            <div v-else class="h-6 w-24 rounded-full bg-base-300" />
-            <p
-              v-if="username"
-              class="w-full truncate text-center text-base-content/60"
-            >
-              {{ username }}
-            </p>
-            <div v-else class="h-6 w-36 rounded-full bg-base-300" />
-            <NuxtLink
-              v-if="email"
-              external
-              :href="`mailto:${email}`"
-              class="link-success w-full truncate text-center"
-            >
-              {{ email }}
-            </NuxtLink>
-            <span v-else class="h-6 w-36 rounded-full bg-base-300" />
-          </div>
-          <div class="flex w-full flex-col items-center justify-center gap-4">
-            <div
-              v-for="(item, index) in 5"
-              :key="index"
-              class="h-12 min-w-[230px] rounded-sm bg-base-300"
-            />
-          </div>
+        <div class="absolute left-1/2 -translate-x-1/2">
+          <ProfileCard
+            :profile-name="name"
+            :profile-email="email"
+            :profile-username="username"
+            :profile-avatar="fileDisplay"
+            :social-links="socialLinks"
+            :profile-theme="theme"
+          />
         </div>
       </div>
     </div>
@@ -71,7 +29,10 @@
           Deixe o seu perfil com sua cara e fale um pouco de você!
         </p>
       </div>
-      <form class="flex w-full flex-col items-start justify-center gap-6" @submit.prevent="onSubmit">
+      <form
+        class="flex w-full flex-col items-start justify-center gap-6"
+        @submit.prevent="onSubmit"
+      >
         <div class="flex w-full flex-col items-start justify-center gap-2">
           <div
             class="flex w-full flex-col items-start justify-between gap-3 rounded-md bg-base-200 p-5 md:flex-row md:items-center"
@@ -139,17 +100,35 @@
           <div
             class="flex w-full flex-col items-start justify-center gap-3 rounded-md bg-base-200 p-5"
           >
-            <InputItem v-model="name" label="Nome completo" name="name" :is-row="true" />
+            <InputItem
+              v-model="name"
+              label="Nome completo"
+              name="name"
+              :is-row="true"
+            />
             <ErrorItem :error="errors.name" />
-            <InputItem v-model="username" label="Usuário" name="username" :is-row="true" />
+            <InputItem
+              v-model="username"
+              label="Usuário"
+              name="username"
+              :is-row="true"
+            />
             <ErrorItem :error="errors.username" />
-            <InputItem v-model="email" label="Email" type="email" name="email" :is-row="true" />
+            <InputItem
+              v-model="email"
+              label="Email"
+              type="email"
+              name="email"
+              :is-row="true"
+            />
             <ErrorItem :error="errors.email" />
             <div
               class="flex w-full flex-col items-start justify-between md:flex-row md:items-center"
             >
               <label class="label" for="theme">Tema</label>
-              <div class="flex w-full flex-col items-start justify-center md:w-[65%]">
+              <div
+                class="flex w-full flex-col items-start justify-center md:w-[65%]"
+              >
                 <select
                   id="theme"
                   v-model="theme"
@@ -164,13 +143,20 @@
                     {{ themeItem }}
                   </option>
                 </select>
-                <small class="text-base-content">Temas baseados nos temas do <NuxtLink class="link" target="_blank" external href="https://daisyui.com/docs/themes/">DaisyUI</NuxtLink></small>
+                <small class="text-base-content">Temas baseados nos temas do
+                  <NuxtLink
+                    class="link"
+                    target="_blank"
+                    external
+                    href="https://daisyui.com/docs/themes/"
+                  >DaisyUI</NuxtLink></small>
               </div>
             </div>
           </div>
         </div>
         <button class="btn btn-primary self-end">
-          Salvar
+          <Icon v-if="saving" name="svg-spinners:8-dots-rotate" size="24" />
+          <span v-else>Salvar</span>
         </button>
       </form>
     </div>
@@ -249,6 +235,8 @@ const { value: username } = useField('username')
 const { value: email } = useField('email')
 const theme = ref('light')
 const userAvatar = ref('')
+const socialLinks = ref([])
+const saving = ref(false)
 
 const file = ref(null)
 const fileDisplay = ref('')
@@ -323,19 +311,26 @@ const uploadUser = async (name, username, email, theme) => {
 }
 
 const onSubmit = handleSubmit(async (values) => {
-  if (!fileDisplay.value) {
-    errorType.value = 'Selecione uma imagem'
-    return
+  try {
+    saving.value = true
+    if (!fileDisplay.value) {
+      errorType.value = 'Selecione uma imagem'
+      return
+    }
+    if (!userAvatar.value || fileData.value) {
+      await uploadAvatar()
+    }
+    await uploadUser(values.name, values.username, values.email, theme.value)
+  } catch (error) {
+    console.log(error)
+  } finally {
+    saving.value = false
   }
-  if (!userAvatar.value || fileData.value) {
-    await uploadAvatar()
-  }
-  await uploadUser(values.name, values.username, values.email, theme.value)
 })
 
 const getUserData = async () => {
   try {
-    const { data, error } = await supabase.from('profiles').select('name, username, email, theme, avatar_url').eq('id', user.value?.id)
+    const { data, error } = await supabase.from('profiles').select('name, username, email, theme, avatar_url, social_links').eq('id', user.value?.id)
 
     if (error) {
       throw error
@@ -347,6 +342,7 @@ const getUserData = async () => {
       email.value = data[0].email
       theme.value = data[0].theme ?? 'light'
       userAvatar.value = data[0].avatar_url ?? ''
+      socialLinks.value = data[0].social_links ?? []
     }
   } catch (error) {
     console.log(error)

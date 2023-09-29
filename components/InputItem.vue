@@ -7,6 +7,7 @@
       :placeholder="placeholder"
       :name="name"
       class="input input-bordered"
+      :class="isRow ? 'w-full md:w-[65%]' : ''"
       @input="$emit('update:modelValue', $event.target.value)"
     >
     <slot />
