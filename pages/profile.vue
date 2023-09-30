@@ -112,6 +112,7 @@
               label="Usuário"
               name="username"
               :is-row="true"
+              @keydown.space.prevent
             />
             <ErrorItem :error="errors.username" />
             <InputItem
@@ -230,6 +231,10 @@ const { handleSubmit, errors } = useForm({
   validationSchema
 })
 
+const slug = computed(() => {
+  return username.value?.trim().toLowerCase().replace(/\s/g, '-')
+})
+
 const { value: name } = useField('name')
 const { value: username } = useField('username')
 const { value: email } = useField('email')
@@ -300,7 +305,8 @@ const uploadUser = async (name, username, email, theme) => {
       username,
       email,
       theme,
-      avatar_url: userAvatar.value
+      avatar_url: userAvatar.value,
+      slug: slug.value
     }).eq('id', user.value?.id).select()
     if (error) {
       throw error
