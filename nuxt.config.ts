@@ -20,7 +20,8 @@ export default defineNuxtConfig({
   app: {
     head: {
       htmlAttrs: {
-        'data-theme': 'light'
+        'data-theme': 'light',
+        lang: 'pt-BR'
       }
     },
     pageTransition: {
