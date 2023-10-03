@@ -27,8 +27,5 @@
     "@vee-validate/zod": "^4.11.7",
     "vee-validate": "^4.11.7",
     "zod": "^3.22.2"
-  },
-  "engines": {
-    "node": ">=20"
   }
 }
