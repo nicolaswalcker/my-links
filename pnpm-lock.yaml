@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@vee-validate/zod':
-    specifier: ^4.11.3
-    version: 4.11.3(vue@3.3.4)
+    specifier: ^4.11.7
+    version: 4.11.7(vue@3.3.4)
   vee-validate:
     specifier: ^4.11.3
     version: 4.11.3(vue@3.3.4)
@@ -2256,10 +2256,6 @@ packages:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
     dev: true
 
-  /@types/node@20.5.9:
-    resolution: {integrity: sha512-PcGNd//40kHAS3sTlzKB9C9XL4K0sTup8nbG5lC14kzEteTNuAFh9u5nA0o5TWnSG2r/JNPRXFVcHJIIeRlmqQ==}
-    dev: true
-
   /@types/node@20.8.0:
     resolution: {integrity: sha512-LzcWltT83s1bthcvjBmiBvGJiiUe84NWRHkw+ZV6Fr41z2FbIzvc815dk2nQ3RAKMuN2fkenM/z3Xv2QzEpYxQ==}
     dev: true
@@ -2516,11 +2512,11 @@ packages:
       vue: 3.3.4
     dev: true
 
-  /@vee-validate/zod@4.11.3(vue@3.3.4):
-    resolution: {integrity: sha512-i6aBNbI3BtwcQfNaNWHEdggCO6v30nYF9lvhuIxLrbek4WocktX6Cs7Vw5RLS44nGJNumw3nhgVsoDVqLoMgnA==}
+  /@vee-validate/zod@4.11.7(vue@3.3.4):
+    resolution: {integrity: sha512-1QONwpY5m93VXimuMLW7nbmvHUGHO3rrTXSM9bxLFWZSggfy5dqepg/RSJBAxlONtjf3P3nqIobGmAfPZrhLzA==}
     dependencies:
       type-fest: 4.3.1
-      vee-validate: 4.11.3(vue@3.3.4)
+      vee-validate: 4.11.7(vue@3.3.4)
       zod: 3.22.2
     transitivePeerDependencies:
       - vue
@@ -5978,7 +5974,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.5.9
+      '@types/node': 20.8.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
     dev: true
@@ -9439,6 +9435,16 @@ packages:
 
   /vee-validate@4.11.3(vue@3.3.4):
     resolution: {integrity: sha512-YhWORdZRE1GL6vXKj3r9f+Y8fJH5JMwMUJ4DFS44+WcTtiNXggyE3pyJPlZBqS9AgYGZ47EOv4UczkLxHqufiw==}
+    peerDependencies:
+      vue: ^3.3.4
+    dependencies:
+      '@vue/devtools-api': 6.5.0
+      type-fest: 4.3.1
+      vue: 3.3.4
+    dev: false
+
+  /vee-validate@4.11.7(vue@3.3.4):
+    resolution: {integrity: sha512-HWnZgOY02mPuAQheaVcKZwahC879YsGNRW4/kkjxeOJ3wu1oruEeomuk+ovCyxTPQoAl1WPHurVJKL1yPGd/WQ==}
     peerDependencies:
       vue: ^3.3.4
     dependencies:
