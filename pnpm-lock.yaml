@@ -9,8 +9,8 @@ dependencies:
     specifier: ^4.11.7
     version: 4.11.7(vue@3.3.4)
   vee-validate:
-    specifier: ^4.11.3
-    version: 4.11.3(vue@3.3.4)
+    specifier: ^4.11.7
+    version: 4.11.7(vue@3.3.4)
   zod:
     specifier: ^3.22.2
     version: 3.22.2
@@ -9432,16 +9432,6 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
     dev: true
-
-  /vee-validate@4.11.3(vue@3.3.4):
-    resolution: {integrity: sha512-YhWORdZRE1GL6vXKj3r9f+Y8fJH5JMwMUJ4DFS44+WcTtiNXggyE3pyJPlZBqS9AgYGZ47EOv4UczkLxHqufiw==}
-    peerDependencies:
-      vue: ^3.3.4
-    dependencies:
-      '@vue/devtools-api': 6.5.0
-      type-fest: 4.3.1
-      vue: 3.3.4
-    dev: false
 
   /vee-validate@4.11.7(vue@3.3.4):
     resolution: {integrity: sha512-HWnZgOY02mPuAQheaVcKZwahC879YsGNRW4/kkjxeOJ3wu1oruEeomuk+ovCyxTPQoAl1WPHurVJKL1yPGd/WQ==}
