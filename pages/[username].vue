@@ -18,17 +18,17 @@
 <script setup>
 const route = useRoute()
 const username = route.params.username
-
+const fileDisplay = ref(null)
 useSeoMeta({
   title: 'MyLinks - @' + username,
   description: 'Perfil do usuário @' + username,
   ogTitle: 'MyLinks - @' + username,
   ogDescription: 'Perfil do usuário @' + username,
-  ogImage: '[og:image]',
-  ogUrl: 'https://mylinks.com.br/' + username.toLowerCase(),
-  twitterTitle: '[twitter:title]',
-  twitterDescription: '[twitter:description]',
-  twitterImage: '[twitter:image]',
+  // ogImage: ,
+  ogUrl: 'https://my-links-silk.vercel.app/' + username.toLowerCase(),
+  twitterTitle: 'MyLinks - @' + username,
+  twitterDescription: 'Perfil do usuário @' + username,
+  twitterImage: `${fileDisplay.value}`,
   twitterCard: 'summary'
 })
 
@@ -48,12 +48,12 @@ definePageMeta({
   layout: false
 })
 
-const fileDisplay = ref(null)
-
 const { add } = useNotification()
 
 const supabase = useSupabaseClient()
 const profile = ref(null)
+
+const runtimeConfig = useRuntimeConfig()
 
 const getUser = async () => {
   try {
@@ -88,6 +88,11 @@ const downloadUserImage = async () => {
       const url = URL.createObjectURL(data)
       fileDisplay.value = url
     }
+
+    useSeoMeta({
+      ogImage: `${runtimeConfig.public.supabase.url}/storage/v1/object/public/profiles/${profile.value.avatar_url}`,
+      twitterImage: `${runtimeConfig.public.supabase.url}/storage/v1/object/public/profiles/${profile.value.avatar_url}`
+    })
   } catch (error) {
     add({
       message: 'Erro ao carregar imagem',

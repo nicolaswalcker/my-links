@@ -15,8 +15,6 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits } from 'vue'
-
 defineProps({
   label: {
     type: String,
