@@ -13,7 +13,7 @@ dependencies:
     version: 4.11.8(vue@3.3.4)
   pinia-plugin-persistedstate:
     specifier: ^3.2.0
-    version: 3.2.0(pinia@2.1.6)
+    version: 3.2.0(pinia@2.1.7)
   vee-validate:
     specifier: ^4.11.8
     version: 4.11.8(vue@3.3.4)
@@ -7025,30 +7025,12 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /pinia-plugin-persistedstate@3.2.0(pinia@2.1.6):
+  /pinia-plugin-persistedstate@3.2.0(pinia@2.1.7):
     resolution: {integrity: sha512-tZbNGf2vjAQcIm7alK40sE51Qu/m9oWr+rEgNm/2AWr1huFxj72CjvpQcIQzMknDBJEkQznCLAGtJTIcLKrKdw==}
     peerDependencies:
       pinia: ^2.0.0
     dependencies:
-      pinia: 2.1.6(typescript@5.2.2)(vue@3.3.4)
-    dev: false
-
-  /pinia@2.1.6(typescript@5.2.2)(vue@3.3.4):
-    resolution: {integrity: sha512-bIU6QuE5qZviMmct5XwCesXelb5VavdOWKWaB17ggk++NUwQWWbP5YnsONTk3b752QkW9sACiR81rorpeOMSvQ==}
-    peerDependencies:
-      '@vue/composition-api': ^1.4.0
-      typescript: '>=4.4.4'
-      vue: ^2.6.14 || ^3.3.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
-        optional: true
-      typescript:
-        optional: true
-    dependencies:
-      '@vue/devtools-api': 6.5.1
-      typescript: 5.2.2
-      vue: 3.3.4
-      vue-demi: 0.14.6(vue@3.3.4)
+      pinia: 2.1.7(typescript@5.2.2)(vue@3.3.4)
     dev: false
 
   /pinia@2.1.7(typescript@5.2.2)(vue@3.3.4):
