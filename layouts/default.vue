@@ -43,7 +43,7 @@
     </button>
   </header>
 
-  <main class="h-auto min-h-[calc(100vh-88px)] w-full">
+  <main class="relative h-auto min-h-[calc(100vh-88px)] w-full">
     <slot />
   </main>
 </template>

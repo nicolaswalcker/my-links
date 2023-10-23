@@ -3,6 +3,7 @@
     class="flex h-screen w-full items-center justify-center bg-base-200 md:py-10"
     :data-theme="profile?.theme"
   >
+    {{ route.hash }}
     <ProfileCard
       v-if="profile"
       :profile-avatar="fileDisplay"
@@ -15,34 +16,65 @@
 </template>
 
 <script setup>
+const route = useRoute()
+const username = route.params.username
+
+useSeoMeta({
+  title: 'MyLinks - @' + username,
+  description: 'Perfil do usuário @' + username,
+  ogTitle: 'MyLinks - @' + username,
+  ogDescription: 'Perfil do usuário @' + username,
+  ogImage: '[og:image]',
+  ogUrl: 'https://mylinks.com.br/' + username.toLowerCase(),
+  twitterTitle: '[twitter:title]',
+  twitterDescription: '[twitter:description]',
+  twitterImage: '[twitter:image]',
+  twitterCard: 'summary'
+})
+
+useHead({
+  htmlAttrs: {
+    lang: 'en'
+  },
+  link: [
+    {
+      rel: 'icon',
+      type: 'image/png',
+      href: '/favicon.png'
+    }
+  ]
+})
 definePageMeta({
   layout: false
 })
 
-const route = useRoute()
-const username = route.params.username
 const fileDisplay = ref(null)
+
+const { add } = useNotification()
 
 const supabase = useSupabaseClient()
 const profile = ref(null)
 
 const getUser = async () => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('slug', username)
-    .single()
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('slug', username)
+      .single()
 
-  if (error) {
-    console.error(error)
+    if (error) {
+      throw error
+    }
+
+    return data
+  } catch (error) {
+    add({
+      message: 'Usuário não encontrado',
+      type: 'error'
+    })
   }
-
-  return data
 }
-
-useSeoMeta({
-  title: 'MyLinks - @' + username
-})
 
 const downloadUserImage = async () => {
   try {
@@ -57,12 +89,17 @@ const downloadUserImage = async () => {
       fileDisplay.value = url
     }
   } catch (error) {
-    console.log(error)
+    add({
+      message: 'Erro ao carregar imagem',
+      type: 'error'
+    })
   }
 }
 
 onMounted(async () => {
   profile.value = await getUser()
-  await downloadUserImage()
+  if (profile.value) {
+    await downloadUserImage()
+  }
 })
 </script>

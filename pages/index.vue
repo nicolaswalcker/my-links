@@ -16,6 +16,7 @@ definePageMeta({
 const user = useSupabaseUser()
 const supabase = useSupabaseClient()
 const profile = ref()
+const { add } = useNotification()
 
 const getUserData = async () => {
   try {
@@ -29,7 +30,10 @@ const getUserData = async () => {
       return data[0]
     }
   } catch (error) {
-    console.log(error)
+    add({
+      message: 'Ocorreu um erro ao carregar os dados do usuário',
+      type: 'error'
+    })
   }
 }
 
@@ -46,7 +50,10 @@ const downloadUserImage = async (avatarUrl) => {
       return url
     }
   } catch (error) {
-    console.log(error)
+    add({
+      message: 'Houve uma falha ao carregar a imagem do usuário',
+      type: 'error'
+    })
   }
 }
 onMounted(async () => {

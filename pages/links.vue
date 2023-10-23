@@ -41,7 +41,7 @@
         v-if="!inputs.length"
         class="flex w-full flex-col items-center justify-center gap-5"
       >
-        <img src="@/assets/images/empty.svg" class="max-w-sm" alt="">
+        <img src="@/assets/images/empty.svg" class="max-w-sm" alt="Imagem de pranchetas cruzadas indicando que não existem links cadastrados">
         <p class="max-w-sm text-center">
           Ops... Parece que você não tem nenhum link cadastrado. Clique no botão
           de <Icon name="solar:add-square-bold" size="24" /> para adicionar um
@@ -69,7 +69,7 @@
         </div>
       </div>
 
-      <button :disabled="!verifyAllUrls" class="btn btn-primary self-end" @click="savePlatforms">
+      <button :disabled="!verifyAllUrls || !isDiff" class="btn btn-primary self-end" @click="savePlatforms">
         <Icon v-if="saving" name="svg-spinners:8-dots-rotate" size="24" />
         <span v-else>Salvar</span>
       </button>
@@ -78,6 +78,7 @@
 </template>
 
 <script setup>
+import cloneDeep from 'lodash/cloneDeep'
 useHead({
   title: 'Links',
   meta: [
@@ -87,6 +88,7 @@ useHead({
     }
   ]
 })
+const { add } = useNotification()
 definePageMeta({
   middleware: 'auth'
 })
@@ -110,7 +112,12 @@ const verifyAllUrls = computed(() => {
 const inputs = ref([])
 const supabase = useSupabaseClient()
 const user = useSupabaseUser()
+const savedInputs = ref([])
 
+// make a watcher to track when inputs is different from savedInputs
+const isDiff = computed(() => {
+  return JSON.stringify(inputs.value) !== JSON.stringify(savedInputs.value)
+})
 const profile = ref({
   avatar_url: '',
   email: '',
@@ -128,10 +135,14 @@ const addInput = () => {
   inputs.value.push({
     id: Math.floor(Math.random() * 10000),
     platform: {
-      name: 'facebook',
-      icon: 'cib:facebook-f'
+      icon: 'cib:facebook-f',
+      name: 'facebook'
     },
     link: ''
+  })
+  add({
+    message: 'Link adicionado com sucesso',
+    type: 'success'
   })
 }
 
@@ -153,6 +164,10 @@ onMounted(async () => {
 
 const removeInput = (id) => {
   inputs.value = inputs.value.filter(item => item.id !== id)
+  add({
+    message: 'Link removido com sucesso',
+    type: 'success'
+  })
 }
 
 const savePlatforms = async () => {
@@ -167,11 +182,19 @@ const savePlatforms = async () => {
 
     if (data) {
       inputs.value = data[0].social_links
+      savedInputs.value = cloneDeep(data[0].social_links)
     }
+    add({
+      message: 'Links salvos com sucesso',
+      type: 'success'
+    })
 
     if (error) { throw error }
   } catch (error) {
-    throw error.message
+    add({
+      message: 'Ocorreu um erro ao salvar os links',
+      type: 'error'
+    })
   } finally {
     saving.value = false
   }
@@ -186,6 +209,7 @@ const getPlatforms = async () => {
 
     if (error) { throw error }
     if (data) {
+      savedInputs.value = cloneDeep(data[0].social_links)
       inputs.value = data[0].social_links
       profile.value = {
         ...data[0]
@@ -195,7 +219,10 @@ const getPlatforms = async () => {
 
     await downloadUserImage()
   } catch (error) {
-    console.log(error.message)
+    add({
+      message: 'Ocorreu um erro ao carregar os links',
+      type: 'error'
+    })
   }
 }
 const downloadUserImage = async () => {
@@ -211,7 +238,10 @@ const downloadUserImage = async () => {
       profile.value.avatar_url = url
     }
   } catch (error) {
-    console.log(error)
+    add({
+      message: 'Houve uma falha ao carregar a imagem do usuário',
+      type: 'error'
+    })
   }
 }
 </script>
