@@ -3,7 +3,6 @@
     class="flex h-screen w-full items-center justify-center bg-base-200 md:py-10"
     :data-theme="profile?.theme"
   >
-    {{ route.hash }}
     <ProfileCard
       v-if="profile"
       :profile-avatar="fileDisplay"
@@ -24,8 +23,6 @@ useSeoMeta({
   description: 'Perfil do usuário @' + username,
   ogTitle: 'MyLinks - @' + username,
   ogDescription: 'Perfil do usuário @' + username,
-  // ogImage: ,
-  ogUrl: 'https://my-links-silk.vercel.app/' + username.toLowerCase(),
   twitterTitle: 'MyLinks - @' + username,
   twitterDescription: 'Perfil do usuário @' + username,
   twitterImage: `${fileDisplay.value}`,
