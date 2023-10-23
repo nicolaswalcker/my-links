@@ -1,8 +1,12 @@
 <template>
   <article
-    class="flex h-full w-full flex-col items-center justify-between gap-3 rounded-md bg-base-100 p-6 md:max-h-[80%] md:max-w-[350px] md:justify-center"
+    class="relative flex h-full w-full flex-col items-center justify-between gap-3 rounded-md bg-base-100 p-6 md:max-h-[80%] md:max-w-[350px] md:justify-center"
     :data-theme="profileTheme"
   >
+    <button v-if="profileUsername" :disabled="copied" class="absolute right-2 top-2 text-secondary-content" @click="copyLink(generateProfileLink())">
+      <Icon v-if="copied" name="material-symbols:check-circle-outline-rounded" size="24" />
+      <Icon v-else name="material-symbols:content-copy-outline-rounded" size="24" />
+    </button>
     <div class="flex w-full flex-col items-center justify-center gap-1">
       <img v-if="profileAvatar" :src="profileAvatar" :alt="`Imagem de perfil de ${profileName}`" class="h-24 w-24 rounded-full object-cover">
       <SkeletonLoading v-else class="h-24 w-24" />
@@ -48,6 +52,20 @@
 </template>
 
 <script setup>
+const { copy, copied } = useClipboard()
+const { add } = useNotification()
+const generateProfileLink = () => {
+  return `${window.location.origin}/${props.profileUsername.toLowerCase() ?? ''}`
+}
+
+const copyLink = (link) => {
+  copy(link)
+  add({
+    message: 'Link copiado!',
+    type: 'success'
+  })
+}
+
 const props = defineProps({
   socialLinks: {
     type: Array,

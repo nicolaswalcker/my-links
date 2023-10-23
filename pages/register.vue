@@ -68,6 +68,7 @@ useHead({
 definePageMeta({
   layout: false
 })
+const { add } = useNotification()
 const route = useRouter()
 const validationSchema = toTypedSchema(
   zod
@@ -76,19 +77,19 @@ const validationSchema = toTypedSchema(
         .string({
           required_error: 'O email é obrigatório'
         })
-        .nonempty({ message: 'O email é obrigatório' })
+        .min(1, { message: 'O email é obrigatório' })
         .email({ message: 'O email deve ser válido' }),
       password: zod
         .string({
           required_error: 'A senha é obrigatória'
         })
-        .nonempty({ message: 'A senha é obrigatória' })
+        .min(1, { message: 'A senha é obrigatória' })
         .min(8, 'A senha deve conter no mínimo 8 caracteres'),
       confirm: zod
         .string({
           required_error: 'A confirmação de senha é obrigatória'
         })
-        .nonempty({ message: 'A confirmação de senha é obrigatória' })
+        .min(1, { message: 'A confirmação de senha é obrigatória' })
     })
     .refine(data => data.password === data.confirm, {
       message: 'As senhas não coincidem',
@@ -109,19 +110,26 @@ const signUp = async (email, password) => {
       email,
       password
     })
+    if (error) {
+      throw error
+    }
     if (data) {
       await insertProfile(email, data.user?.id)
       await insertSocials(data.user?.id)
     }
-    if (error) {
-      throw error
-    }
     await route.push('/')
   } catch (error) {
-    errorMsg.value = error.message
-    setTimeout(() => {
-      errorMsg.value = ''
-    }, 5000)
+    if (error.status === 400 && error.name === 'AuthApiError') {
+      add({
+        message: 'Email já cadastrado!',
+        type: 'error'
+      })
+    } else {
+      add({
+        message: 'Erro ao criar conta!',
+        type: 'error'
+      })
+    }
   } finally {
     loading.value = false
   }

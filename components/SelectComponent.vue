@@ -59,8 +59,8 @@ const prop = defineProps({
   selected: {
     type: Object,
     default: () => ({
-      name: 'facebook',
-      icon: 'cib:facebook-f'
+      icon: 'cib:facebook-f',
+      name: 'facebook'
     })
   }
 })
@@ -70,64 +70,64 @@ const selected = ref(prop.selected)
 const emit = defineEmits(['update:selected'])
 const socialList = ref([
   {
-    name: 'facebook',
-    icon: 'cib:facebook-f'
+    icon: 'cib:facebook-f',
+    name: 'facebook'
   },
   {
-    name: 'twitter',
-    icon: 'cib:twitter'
+    icon: 'cib:twitter',
+    name: 'twitter'
   },
   {
-    name: 'instagram',
-    icon: 'cib:instagram'
+    icon: 'cib:instagram',
+    name: 'instagram'
   },
   {
-    name: 'linkedin',
-    icon: 'cib:linkedin-in'
+    icon: 'cib:linkedin-in',
+    name: 'linkedin'
   },
   {
-    name: 'github',
-    icon: 'cib:github'
+    icon: 'cib:github',
+    name: 'github'
   },
   {
-    name: 'youtube',
-    icon: 'cib:youtube'
+    icon: 'cib:youtube',
+    name: 'youtube'
   },
   {
-    name: 'twitch',
-    icon: 'cib:twitch'
+    icon: 'cib:twitch',
+    name: 'twitch'
   },
   {
-    name: 'tiktok',
-    icon: 'cib:tiktok'
+    icon: 'cib:tiktok',
+    name: 'tiktok'
   },
   {
-    name: 'spotify',
-    icon: 'cib:spotify'
+    icon: 'cib:spotify',
+    name: 'spotify'
   },
   {
-    name: 'pinterest',
-    icon: 'cib:pinterest-p'
+    icon: 'cib:pinterest-p',
+    name: 'pinterest'
   },
   {
-    name: 'behance',
-    icon: 'cib:behance'
+    icon: 'cib:behance',
+    name: 'behance'
   },
   {
-    name: 'dribbble',
-    icon: 'cib:dribbble'
+    icon: 'cib:dribbble',
+    name: 'dribbble'
   },
   {
-    name: 'medium',
-    icon: 'cib:medium-m'
+    icon: 'cib:medium-m',
+    name: 'medium'
   },
   {
-    name: 'reddit',
-    icon: 'cib:reddit-alt'
+    icon: 'cib:reddit-alt',
+    name: 'reddit'
   },
   {
-    name: 'dev',
-    icon: 'cib:dev-to'
+    icon: 'cib:dev-to',
+    name: 'dev'
   }
 ])
 

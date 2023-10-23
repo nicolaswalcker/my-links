@@ -74,19 +74,21 @@ definePageMeta({
   layout: false
 })
 
+const { add } = useNotification()
+
 const validationSchema = toTypedSchema(
   zod.object({
     email: zod
       .string({
         required_error: 'O email é obrigatório'
       })
-      .nonempty({ message: 'O email é obrigatório' })
+      .min(1, { message: 'O email é obrigatório' })
       .email({ message: 'O email deve ser válido' }),
     password: zod
       .string({
         required_error: 'A senha é obrigatória'
       })
-      .nonempty({ message: 'A senha é obrigatória' })
+      .min(1, { message: 'A senha é obrigatória' })
   })
 )
 
@@ -112,16 +114,27 @@ const signIn = async (email, password) => {
     if (error) {
       throw error
     }
-
-    await router.push('/')
-  } catch (error) {
-    errorMsg.value = error.message
-  } finally {
     if (remember.value) {
       localStorage.setItem('email', email)
     } else {
       localStorage.removeItem('email')
     }
+    await router.push('/')
+  } catch (error) {
+    if (error.status === 400 && error.name === 'AuthApiError') {
+      add({
+        message: 'Email ou senha incorretos',
+        type: 'error'
+      })
+      localStorage.removeItem('email')
+      remember.value = false
+    } else {
+      add({
+        message: 'Ocorreu um erro ao fazer login',
+        type: 'error'
+      })
+    }
+  } finally {
     loading.value = false
   }
 }

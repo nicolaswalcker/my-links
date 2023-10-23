@@ -155,7 +155,7 @@
             </div>
           </div>
         </div>
-        <button class="btn btn-primary self-end">
+        <button class="btn btn-primary self-end" :disabled="haveDifference()">
           <Icon v-if="saving" name="svg-spinners:8-dots-rotate" size="24" />
           <span v-else>Salvar</span>
         </button>
@@ -202,19 +202,23 @@ const themesList = ref([
   'coffee',
   'winter'
 ])
+const { add } = useNotification()
+
+const savedItems = ref({})
 
 useHead({
   title: 'Perfil'
 })
+
 const validationSchema = toTypedSchema(zod.object({
   name: zod.string({
     required_error: 'O nome é obrigatório'
-  }).nonempty({
+  }).min(1, {
     message: 'O nome é obrigatório'
   }),
   username: zod.string({
     required_error: 'O usuário é obrigatório'
-  }).nonempty({
+  }).min(1, {
     message: 'O nome de usuário é obrigatório'
   }),
   email: zod.string({
@@ -222,7 +226,7 @@ const validationSchema = toTypedSchema(zod.object({
     required_error: 'O email é obrigatório'
   }).email({
     message: 'O email deve ser válido'
-  }).nonempty({
+  }).min(1, {
     message: 'O email é obrigatório'
   })
 }))
@@ -247,6 +251,7 @@ const file = ref(null)
 const fileDisplay = ref('')
 const fileData = ref()
 const errorType = ref('')
+const filePath = ref('')
 
 const onChange = (e) => {
   errorType.value = ''
@@ -255,6 +260,8 @@ const onChange = (e) => {
   }
   fileDisplay.value = URL.createObjectURL(e.target.files[0])
   fileData.value = e.target.files[0]
+  const fileExt = fileData.value?.name.split('.').pop()
+  filePath.value = fileData.value ? `${Math.random()}.${fileExt}` : ''
 }
 
 const onDrop = (e) => {
@@ -264,12 +271,17 @@ const onDrop = (e) => {
     file.value.name.lastIndexOf('.') + 1
   )
   if (extention !== 'png' && extention !== 'jpg' && extention !== 'jpeg') {
-    errorType.value = 'Tipo de arquivo inválido'
+    add({
+      message: 'Formato de imagem inválido',
+      type: 'error'
+    })
     return
   }
 
   fileDisplay.value = URL.createObjectURL(e.dataTransfer.files[0])
   fileData.value = e.dataTransfer.files[0]
+  const fileExt = fileData.value?.name.split('.').pop()
+  filePath.value = fileData.value ? `${Math.random()}.${fileExt}` : ''
 }
 
 const clearImage = () => {
@@ -281,38 +293,43 @@ const clearImage = () => {
 const supabase = useSupabaseClient()
 
 const uploadAvatar = async () => {
-  const fileExt = fileData.value?.name.split('.').pop()
-  const filePath = fileData.value ? `${Math.random()}.${fileExt}` : ''
   try {
-    const { error } = await supabase.storage.from('profiles').upload(filePath, fileData.value)
+    const { error } = await supabase.storage.from('profiles').upload(filePath.value, fileData.value)
 
     if (error) {
       throw error
     }
 
-    userAvatar.value = filePath
+    userAvatar.value = filePath.value
   } catch (error) {
-    console.log(error)
+    add({
+      message: 'Ocorreu um erro ao carregar os dados do usuário',
+      type: 'error'
+    })
   }
 }
 
 const user = useSupabaseUser()
 
 const uploadUser = async (name, username, email, theme) => {
-  try {
-    const { error } = await supabase.from('profiles').update({
-      name,
-      username,
-      email,
-      theme,
-      avatar_url: userAvatar.value,
-      slug: slug.value
-    }).eq('id', user.value?.id).select()
-    if (error) {
-      throw error
-    }
-  } catch (error) {
-    console.log(error)
+  const { data, error } = await supabase.from('profiles').update({
+    name,
+    username,
+    email,
+    theme,
+    avatar_url: userAvatar.value,
+    slug: slug.value
+  }).eq('id', user.value?.id).select()
+
+  if (data) {
+    savedItems.value.name = Object.freeze(name)
+    savedItems.value.username = Object.freeze(username)
+    savedItems.value.email = Object.freeze(email)
+    savedItems.value.theme = Object.freeze(theme)
+    savedItems.value.avatar_url = Object.freeze(userAvatar.value)
+  }
+  if (error) {
+    throw error
   }
 }
 
@@ -320,19 +337,37 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     saving.value = true
     if (!fileDisplay.value) {
-      errorType.value = 'Selecione uma imagem'
+      add({
+        message: 'Selecione uma imagem para o perfil!',
+        type: 'error'
+      })
       return
     }
     if (!userAvatar.value || fileData.value) {
       await uploadAvatar()
     }
     await uploadUser(values.name, values.username, values.email, theme.value)
+    add({
+      message: 'Perfil atualizado com sucesso',
+      type: 'success'
+    })
   } catch (error) {
-    console.log(error)
+    add({
+      message: 'Ocorreu um erro ao atualizar o perfil',
+      type: 'error'
+    })
   } finally {
     saving.value = false
   }
 })
+
+const haveDifference = () => {
+  return !(savedItems.value.name !== name.value ||
+    savedItems.value.username !== username.value ||
+    savedItems.value.email !== email.value ||
+    savedItems.value.theme !== theme.value ||
+    savedItems.value.avatar_url !== filePath.value)
+}
 
 const getUserData = async () => {
   try {
@@ -349,9 +384,19 @@ const getUserData = async () => {
       theme.value = data[0].theme ?? 'light'
       userAvatar.value = data[0].avatar_url ?? ''
       socialLinks.value = data[0].social_links ?? []
+      filePath.value = data[0].avatar_url ?? ''
+
+      savedItems.value.name = Object.freeze(name.value)
+      savedItems.value.username = Object.freeze(username.value)
+      savedItems.value.email = Object.freeze(email.value)
+      savedItems.value.theme = Object.freeze(theme.value)
+      savedItems.value.avatar_url = Object.freeze(userAvatar.value)
     }
   } catch (error) {
-    console.log(error)
+    add({
+      message: 'Ocorreu um erro ao carregar os dados do usuário',
+      type: 'error'
+    })
   }
 }
 const downloadUserImage = async () => {
@@ -367,7 +412,10 @@ const downloadUserImage = async () => {
       fileDisplay.value = url
     }
   } catch (error) {
-    console.log(error)
+    add({
+      message: 'Houve uma falha ao carregar a imagem do usuário',
+      type: 'error'
+    })
   }
 }
 
