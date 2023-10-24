@@ -3,6 +3,10 @@
     class="flex h-screen w-full items-center justify-center bg-base-200 md:py-10"
     :data-theme="profile?.theme"
   >
+    <Head>
+      <Meta name="og:image" :content="metaImage" />
+      <Meta name="twitter:image" :content="metaImage" />
+    </Head>
     <ProfileCard
       v-if="profile"
       :profile-avatar="fileDisplay"
@@ -18,16 +22,24 @@
 const route = useRoute()
 const username = route.params.username
 const fileDisplay = ref(null)
-
+useSeoMeta({
+  title: 'MyLinks - @' + username,
+  description: 'Perfil do usuário @' + username,
+  ogTitle: 'MyLinks - @' + username,
+  ogDescription: 'Perfil do usuário @' + username,
+  ogUrl: 'https://my-links-silk.vercel.app/' + username.toLowerCase(),
+  twitterTitle: 'MyLinks - @' + username,
+  twitterDescription: 'Perfil do usuário @' + username,
+  twitterCard: 'summary'
+})
 useHead({
   htmlAttrs: {
-    lang: 'en'
+    lang: 'pt-BR'
   },
   link: [
     {
       rel: 'icon',
-      type: 'image/png',
-      href: '/favicon.png'
+      href: '/favicon.ico'
     }
   ]
 })
@@ -41,6 +53,10 @@ const supabase = useSupabaseClient()
 const profile = ref(null)
 
 const runtimeConfig = useRuntimeConfig()
+
+const metaImage = computed(() => {
+  return `${runtimeConfig.public.supabase.url}/storage/v1/object/public/profiles/${profile.value?.avatar_url}`
+})
 
 const getUser = async () => {
   try {
@@ -75,11 +91,6 @@ const downloadUserImage = async () => {
       const url = URL.createObjectURL(data)
       fileDisplay.value = url
     }
-
-    useSeoMeta({
-      ogImage: `${runtimeConfig.public.supabase.url}/storage/v1/object/public/profiles/${profile.value.avatar_url}`,
-      twitterImage: `${runtimeConfig.public.supabase.url}/storage/v1/object/public/profiles/${profile.value.avatar_url}`
-    })
   } catch (error) {
     add({
       message: 'Erro ao carregar imagem',
@@ -88,27 +99,15 @@ const downloadUserImage = async () => {
   }
 }
 
-const metaImage = computed(() => {
-  if (profile.value) {
-    return `${runtimeConfig.public.supabase.url}/storage/v1/object/public/profiles/${profile.value.avatar_url}`
-  }
-})
-useSeoMeta({
-  title: 'MyLinks - @' + username,
-  description: 'Perfil do usuário @' + username,
-  ogTitle: 'MyLinks - @' + username,
-  ogDescription: 'Perfil do usuário @' + username,
-  ogUrl: 'https://my-links-silk.vercel.app/' + username.toLowerCase(),
-  ogImage: () => metaImage.value,
-  twitterTitle: 'MyLinks - @' + username,
-  twitterDescription: 'Perfil do usuário @' + username,
-  twitterCard: 'summary',
-  twitterImage: () => metaImage.value
-})
 onMounted(async () => {
   profile.value = await getUser()
   if (profile.value) {
     await downloadUserImage()
   }
+
+  // useSeoMeta({
+  //   ogImage: `${runtimeConfig.public.supabase.url}/storage/v1/object/public/profiles/${profile.value.avatar_url}`,
+  //   twitterImage: `${runtimeConfig.public.supabase.url}/storage/v1/object/public/profiles/${profile.value.avatar_url}`
+  // })
 })
 </script>
