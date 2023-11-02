@@ -16,6 +16,15 @@
         @submit.prevent="onSubmit"
       >
         <InputItem
+          v-model="name"
+          name="name"
+          label="Nome"
+          placeholder="Insira seu nome"
+          type="text"
+        >
+          <ErrorItem :error="errors.name" />
+        </InputItem>
+        <InputItem
           v-model="email"
           name="email"
           label="Email"
@@ -23,6 +32,15 @@
           type="email"
         >
           <ErrorItem :error="errors.email" />
+        </InputItem>
+        <InputItem
+          v-model="username"
+          name="username"
+          label="Nome de usuario"
+          placeholder="Digite um nome"
+          type="text"
+        >
+          <ErrorItem :error="errors.username" />
         </InputItem>
         <InputItem
           v-model="password"
@@ -43,7 +61,7 @@
           <ErrorItem :error="errors.confirm" />
         </InputItem>
         <ErrorItem :error="errorMsg" />
-        <button class="btn w-full">
+        <button class="btn w-full" :disabled="JSON.stringify(errors) !== '{}'">
           <icon v-if="loading" name="svg-spinners:8-dots-rotate" />
           <span v-else>Criar conta</span>
         </button>
@@ -70,6 +88,8 @@ definePageMeta({
 })
 const { add } = useNotification()
 const route = useRouter()
+
+const usernameList = ref([])
 const validationSchema = toTypedSchema(
   zod
     .object({
@@ -79,6 +99,11 @@ const validationSchema = toTypedSchema(
         })
         .min(1, { message: 'O email é obrigatório' })
         .email({ message: 'O email deve ser válido' }),
+      username: zod.string({ required_error: 'O nome de usuário é obrigatório' }).min(1, { message: 'O nome de usuário é obrigatório' }).refine(value => !usernameList.value.includes(value), {
+        message: 'O nome de usuário já está em uso',
+        path: ['username']
+      }),
+      name: zod.string({ required_error: 'O nome é obrigatório' }).min(1, { message: 'O nome é obrigatório' }),
       password: zod
         .string({
           required_error: 'A senha é obrigatória'
@@ -103,7 +128,7 @@ const { handleSubmit, errors } = useForm({
 
 const supabase = useSupabaseClient()
 
-const signUp = async (email, password) => {
+const signUp = async (email, password, username, name) => {
   try {
     loading.value = true
     const { data, error } = await supabase.auth.signUp({
@@ -114,7 +139,7 @@ const signUp = async (email, password) => {
       throw error
     }
     if (data) {
-      await insertProfile(email, data.user?.id)
+      await insertProfile(email, data.user?.id, username, name)
       await insertSocials(data.user?.id)
     }
     await route.push('/')
@@ -135,11 +160,13 @@ const signUp = async (email, password) => {
   }
 }
 
-const insertProfile = async (email, id) => {
+const insertProfile = async (email, id, username, name) => {
   try {
     const { error } = await supabase.from('profiles').insert({
       email,
-      id
+      id,
+      username,
+      name
     })
     if (error) {
       throw error
@@ -149,6 +176,20 @@ const insertProfile = async (email, id) => {
     setTimeout(() => {
       errorMsg.value = ''
     }, 5000)
+  }
+}
+
+const getAllUsernames = async () => {
+  try {
+    const { data, error } = await supabase.from('profiles').select('username')
+
+    if (error) {
+      throw error
+    }
+
+    return data
+  } catch (error) {
+    throw new Error(error.message)
   }
 }
 
@@ -168,14 +209,20 @@ const insertSocials = async (id) => {
   }
 }
 
+onMounted(async () => {
+  usernameList.value = (await getAllUsernames()).map(item => item.username)
+})
+
 const errorMsg = ref('')
 const loading = ref(false)
 
 const onSubmit = handleSubmit((values) => {
-  signUp(values.email, values.password)
+  signUp(values.email, values.password, values.username, values.name)
 })
 
 const { value: email } = useField('email')
+const { value: name } = useField('name')
+const { value: username } = useField('username')
 const { value: password } = useField('password')
 const { value: confirm } = useField('confirm')
 </script>
