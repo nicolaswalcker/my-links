@@ -252,6 +252,7 @@ const fileDisplay = ref('')
 const fileData = ref()
 const errorType = ref('')
 const filePath = ref('')
+const fileNameToSend = ref('')
 
 const onChange = (e) => {
   errorType.value = ''
@@ -262,6 +263,7 @@ const onChange = (e) => {
   fileData.value = e.target.files[0]
   const fileExt = fileData.value?.name.split('.').pop()
   filePath.value = fileData.value ? `${Math.random()}.${fileExt}` : ''
+  fileNameToSend.value = fileData.value ? `${user.value?.id}.${fileExt}` : ''
 }
 
 const onDrop = (e) => {
@@ -282,6 +284,7 @@ const onDrop = (e) => {
   fileData.value = e.dataTransfer.files[0]
   const fileExt = fileData.value?.name.split('.').pop()
   filePath.value = fileData.value ? `${Math.random()}.${fileExt}` : ''
+  fileNameToSend.value = fileData.value ? `${user.value?.id}.${fileExt}` : ''
 }
 
 const clearImage = () => {
@@ -290,17 +293,56 @@ const clearImage = () => {
   file.value = null
 }
 
-const supabase = useSupabaseClient()
+const imageIsOnStorage = async () => {
+  const { data, error } = await supabase.storage.from('profiles').list()
 
-const uploadAvatar = async () => {
+  if (error) {
+    throw error
+  }
+
+  const files = data.filter(file => file.name.slice(0, -4) === userAvatar.value.slice(0, -4))
+
+  return files.length > 0
+}
+
+const upProfileImage = async () => {
+  const imageIsOnStorageItem = await imageIsOnStorage()
+  if (!userAvatar.value || fileData.value) {
+    if (!imageIsOnStorageItem) {
+      await uploadAvatar()
+    } else {
+      await updateUserAvatar()
+    }
+  }
+}
+
+const updateUserAvatar = async () => {
   try {
-    const { error } = await supabase.storage.from('profiles').upload(filePath.value, fileData.value)
+    const { error } = await supabase.storage.from('profiles').update(fileNameToSend.value, fileData.value)
 
     if (error) {
       throw error
     }
 
-    userAvatar.value = filePath.value
+    userAvatar.value = fileNameToSend.value
+    filePath.value = fileNameToSend.value
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const supabase = useSupabaseClient()
+
+const uploadAvatar = async () => {
+  try {
+    const { error } = await supabase.storage.from('profiles').upload(fileNameToSend.value, fileData.value)
+
+    if (error) {
+      throw error
+    }
+
+    userAvatar.value = fileNameToSend.value
+    filePath.value = fileNameToSend.value
   } catch (error) {
     add({
       message: 'Ocorreu um erro ao carregar os dados do usuário',
@@ -344,7 +386,7 @@ const onSubmit = handleSubmit(async (values) => {
       return
     }
     if (!userAvatar.value || fileData.value) {
-      await uploadAvatar()
+      await upProfileImage()
     }
     await uploadUser(values.name, values.username, values.email, theme.value)
     add({
