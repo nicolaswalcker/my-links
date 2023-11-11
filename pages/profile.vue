@@ -163,7 +163,7 @@
     </div>
     <article
       ref="og"
-      class="absolute left-full z-0 flex h-screen max-h-96 w-full max-w-3xl flex-col items-center justify-center gap-3 border-none bg-primary
+      class="absolute left-full z-0 flex h-[600px] w-[1200px] flex-col items-center justify-center gap-3 border-none bg-primary
     "
     >
       <img :src="fileDisplay" alt="image" class="h-28 w-28 rounded-full border-none object-cover">
