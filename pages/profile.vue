@@ -1,6 +1,6 @@
 <template>
   <section
-    class="flex h-auto min-h-[calc(100vh-88px)] w-full items-start justify-end gap-4 bg-base-200 transition-all md:p-4"
+    class="relative flex h-auto min-h-[calc(100vh-88px)] w-full items-start justify-end gap-4 overflow-x-hidden bg-base-200 transition-all md:p-4"
   >
     <div class="relative hidden w-[40%] md:block">
       <div
@@ -161,6 +161,16 @@
         </button>
       </form>
     </div>
+    <article
+      ref="og"
+      class="absolute left-full z-0 flex h-screen max-h-96 w-full max-w-3xl flex-col items-center justify-center gap-3 border-none bg-primary
+    "
+    >
+      <img :src="fileDisplay" alt="image" class="h-28 w-28 rounded-full border-none object-cover">
+      <h1 class="border-none text-3xl font-semibold text-primary-content">
+        @{{ username }}
+      </h1>
+    </article>
   </section>
 </template>
 
@@ -168,6 +178,9 @@
 import * as zod from 'zod'
 import { useForm, useField } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
+import domtoimage from 'dom-to-image-more'
+import { decode } from 'base64-arraybuffer'
+const og = ref(null)
 definePageMeta({
   middleware: 'auth'
 })
@@ -305,6 +318,17 @@ const imageIsOnStorage = async () => {
   return files.length > 0
 }
 
+const uploadOg = async (files, imageName, imageFile) => {
+  if (files.length > 0) {
+    await supabase.storage.from('og').remove(files[0].name)
+  }
+
+  await supabase.storage.from('og').upload(imageName, decode(imageFile), {
+    contentType: 'image/png'
+  })
+}
+const base64 = ref('')
+const ogName = ref('')
 const upProfileImage = async () => {
   const imageIsOnStorageItem = await imageIsOnStorage()
   if (!userAvatar.value || fileData.value) {
@@ -314,6 +338,25 @@ const upProfileImage = async () => {
       await updateUserAvatar()
     }
   }
+
+  const { data, error } = await supabase.storage.from('og').list()
+
+  if (error) {
+    throw error
+  }
+  const files = data.filter(file => file.name.slice(0, -4) === slug.value)
+
+  await domtoimage.toPng(og.value).then(function (dataUrl) {
+    const img = new Image()
+    img.src = dataUrl
+    // document.body.appendChild(img)
+    ogName.value = `${savedItems.value?.username}.png`
+    base64.value = img.src.split('base64,')[1]
+  }).catch(function (error) {
+    throw new Error(error)
+  })
+
+  await uploadOg(files, ogName.value, base64.value)
 }
 
 const updateUserAvatar = async () => {
@@ -385,10 +428,10 @@ const onSubmit = handleSubmit(async (values) => {
       })
       return
     }
+    await uploadUser(values.name, values.username, values.email, theme.value)
     if (!userAvatar.value || fileData.value) {
       await upProfileImage()
     }
-    await uploadUser(values.name, values.username, values.email, theme.value)
     add({
       message: 'Perfil atualizado com sucesso',
       type: 'success'
@@ -463,6 +506,10 @@ const downloadUserImage = async () => {
 
 onMounted(async () => {
   await getUserData()
-  downloadUserImage()
+  await downloadUserImage()
+})
+
+onBeforeUnmount(() => {
+  URL.revokeObjectURL(fileDisplay.value)
 })
 </script>
