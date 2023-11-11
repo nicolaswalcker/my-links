@@ -3,10 +3,6 @@
     class="flex h-screen w-full items-center justify-center bg-base-200 md:py-10"
     :data-theme="profile?.theme"
   >
-    <Head>
-      <Meta name="og:image" :content="metaImage" />
-      <Meta name="twitter:image" :content="metaImage" />
-    </Head>
     <ProfileCard
       v-if="profile"
       :profile-avatar="fileDisplay"
@@ -54,12 +50,6 @@ const { add } = useNotification()
 const supabase = useSupabaseClient()
 const profile = ref(null)
 
-const runtimeConfig = useRuntimeConfig()
-
-const metaImage = computed(() => {
-  return `${runtimeConfig.public.supabase.url}/storage/v1/object/public/profiles/${profile.value?.avatar_url}`
-})
-
 const getUser = async () => {
   try {
     const { data, error } = await supabase
@@ -106,10 +96,5 @@ onMounted(async () => {
   if (profile.value) {
     await downloadUserImage()
   }
-
-  // useSeoMeta({
-  //   ogImage: `${runtimeConfig.public.supabase.url}/storage/v1/object/public/profiles/${profile.value.avatar_url}`,
-  //   twitterImage: `${runtimeConfig.public.supabase.url}/storage/v1/object/public/profiles/${profile.value.avatar_url}`
-  // })
 })
 </script>
