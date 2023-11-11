@@ -5,6 +5,12 @@ dependencies:
   '@vee-validate/zod':
     specifier: ^4.11.8
     version: 4.11.8(vue@3.3.4)
+  base64-arraybuffer:
+    specifier: ^1.0.2
+    version: 1.0.2
+  dom-to-image-more:
+    specifier: ^3.2.0
+    version: 3.2.0
   pinia-plugin-persistedstate:
     specifier: ^3.2.0
     version: 3.2.0(pinia@2.1.7)
@@ -2981,6 +2987,11 @@ packages:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
     dev: true
 
+  /base64-arraybuffer@1.0.2:
+    resolution: {integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==}
+    engines: {node: '>= 0.6.0'}
+    dev: false
+
   /big-integer@1.6.51:
     resolution: {integrity: sha512-GPEid2Y9QU1Exl1rpO9B2IPJGHPSupF5GnVIP0blYvNOMer2bTvSWs1jGOUg04hTmu67nmLsQ9TBo1puaotBHg==}
     engines: {node: '>=0.6'}
@@ -3797,6 +3808,10 @@ packages:
       domhandler: 5.0.3
       entities: 4.5.0
     dev: true
+
+  /dom-to-image-more@3.2.0:
+    resolution: {integrity: sha512-2bGQTB6m17MBseVhIjShwZqqqCyVS9GgTykWqvVXMqr56fSgHhXnEvZfZkaSuHJYW3ICZQ3sZwAu+UY5tfsF9Q==}
+    dev: false
 
   /domelementtype@2.3.0:
     resolution: {integrity: sha512-OLETBj6w0OsagBwdXnPdN0cnMfF9opN69co+7ZrbfPGrdpPVNBUj02spi6B1N7wChLQiPn4CSH/zJvXw56gmHw==}

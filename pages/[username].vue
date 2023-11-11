@@ -28,6 +28,8 @@ useSeoMeta({
   ogTitle: 'MyLinks - @' + username,
   ogDescription: 'Perfil do usuário @' + username,
   ogUrl: 'https://my-links-silk.vercel.app/' + username.toLowerCase(),
+  ogImage: `https://ltztoakayexpmxqyspvz.supabase.co/storage/v1/object/public/og/${username}.png`,
+  twitterImage: `https://ltztoakayexpmxqyspvz.supabase.co/storage/v1/object/public/og/${username}.png`,
   twitterTitle: 'MyLinks - @' + username,
   twitterDescription: 'Perfil do usuário @' + username,
   twitterCard: 'summary'
