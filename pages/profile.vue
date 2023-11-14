@@ -324,7 +324,9 @@ const uploadOg = async (files, imageName, imageFile) => {
   }
 
   await supabase.storage.from('og').upload(imageName, decode(imageFile), {
-    contentType: 'image/png'
+    contentType: 'image/png',
+    cacheControl: '300',
+    upsert: true
   })
 }
 const base64 = ref('')
